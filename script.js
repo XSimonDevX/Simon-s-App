@@ -241,57 +241,118 @@ addBtn.addEventListener("click", async () => {
   }
 });
 
-// ===== Display Cards =====
+// --- Helper: delete a card safely (by id if available, otherwise by matching text) ---
+async function deleteCardFromDB(card) {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE, "readwrite");
+    const store = tx.objectStore(STORE);
+
+    if (card.id != null) {
+      store.delete(card.id);
+    } else {
+      // fallback for older cards (match by text)
+      const idx = store.index("text");
+      const req = idx.openCursor(card.text);
+      req.onsuccess = (ev) => {
+        const cursor = ev.target.result;
+        if (cursor) {
+          cursor.delete();
+        }
+      };
+      req.onerror = () => reject(req.error);
+    }
+
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
+
+// --- Main displayCards() ---
+// helper stays as-is
+async function deleteCardFromDB(card) {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE, "readwrite");
+    const store = tx.objectStore(STORE);
+    if (card.id != null) {
+      store.delete(card.id);
+    } else {
+      const idx = store.index("text");
+      const req = idx.openCursor(card.text);
+      req.onsuccess = (ev) => {
+        const cursor = ev.target.result;
+        if (cursor) cursor.delete();
+      };
+      req.onerror = () => reject(req.error);
+    }
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
 async function displayCards() {
   const cards = await getAllCardsFromDB();
   cardContainer.innerHTML = "";
 
-  cards.forEach(card => {
+  for (const card of cards) {
+    const imgURL = card.imageBlob ? urlFor(card.imageBlob) : "";
+
+    // Render HTML with a real delete button element in it
     const div = document.createElement("div");
     div.className = "card";
     div.draggable = true;
+    div.dataset.id = card.id ?? "";          // for delete lookup
+    div.dataset.text = card.text;
 
-    // Image (from blob)
-    const imgURL = urlFor(card.imageBlob);
-    if (imgURL) {
-      const img = document.createElement("img");
-      img.src = imgURL;
-      div.appendChild(img);
-    }
-
-    // Text label
-    const p = document.createElement("p");
-    p.textContent = card.text;
-    div.appendChild(p);
-
-    // --- Delete button ---
-    const del = document.createElement("button");
-    del.className = "delete-btn";
-    del.textContent = "✖";
-    del.title = "Delete this card";
-    del.addEventListener("click", async (e) => {
-      e.stopPropagation();
-      if (confirm(`Delete "${card.text}"?`)) {
-        const db = await openDB();
-        const tx = db.transaction(STORE, "readwrite");
-        tx.objectStore(STORE).delete(card.id);
-        tx.oncomplete = () => displayCards();
-      }
-    });
-    div.appendChild(del);
-
-    // --- Click to play audio/TTS ---
+    div.innerHTML = `
+      ${imgURL ? `<img src="${imgURL}" alt="${card.text}" style="pointer-events:none">` : ""}
+      <p>${card.text}</p>
+      <button class="delete-btn" title="Delete">✖</button>
+    `;
+    // speak on tap
     div.addEventListener("click", () => playCard(card, div));
-
-    // --- Drag support ---
-    div.addEventListener("dragstart", e => {
+    // drag support
+    div.addEventListener("dragstart", (e) => {
       e.dataTransfer.setData("text/plain", JSON.stringify({ text: card.text, image: imgURL }));
     });
 
     cardContainer.appendChild(div);
+  }
+
+  // Optional: tweak label sizing after render
+  requestAnimationFrame(() => {
+    document
+      .querySelectorAll("#cardContainer .card p")
+      .forEach(p => { p.style.fontSize = "15px"; });
   });
 }
+// One listener to handle all current/future delete buttons
+cardContainer.addEventListener("click", async (e) => {
+  const btn = e.target.closest(".delete-btn");
+  if (!btn) return;
 
+  e.stopPropagation();
+  e.preventDefault();
+
+  const cardEl = btn.closest(".card");
+  const id = cardEl.dataset.id ? Number(cardEl.dataset.id) : null;
+  const text = cardEl.dataset.text || "";
+
+  if (!confirm(`Delete "${text}"?`)) return;
+
+  // Build a minimal "card" object for the helper
+  const toDelete = id != null ? { id, text } : { text };
+
+  try {
+    await deleteCardFromDB(toDelete);
+    await displayCards();
+  } catch (err) {
+    console.error(err);
+    alert("Failed to delete card: " + err.message);
+  }
+});
 
 // ===== Speak / Play =====
 function playCard(card, element) {
@@ -650,21 +711,3 @@ if (voiceSelect) {
   await displayCards();
   displayCoreWords();
 })();
-// === AUTO-PADDING FOR STICKY SENTENCE BUILDER ===
-function adjustBottomPadding() {
-  const sentenceSection = document.getElementById("sentence");
-  if (!sentenceSection) return;
-
-  const dockHeight = sentenceSection.offsetHeight;
-  // Add a bit extra space for safety
-  const padding = dockHeight + 40;
-  document.body.style.paddingBottom = `${padding}px`;
-}
-
-// Adjust on load, resize, and whenever content changes
-window.addEventListener("load", adjustBottomPadding);
-window.addEventListener("resize", adjustBottomPadding);
-new MutationObserver(adjustBottomPadding).observe(
-  document.body,
-  { childList: true, subtree: true }
-);
