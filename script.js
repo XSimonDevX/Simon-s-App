@@ -245,15 +245,45 @@ addBtn.addEventListener("click", async () => {
 async function displayCards() {
   const cards = await getAllCardsFromDB();
   cardContainer.innerHTML = "";
+
   cards.forEach(card => {
     const div = document.createElement("div");
     div.className = "card";
     div.draggable = true;
 
+    // Image (from blob)
     const imgURL = urlFor(card.imageBlob);
-    div.innerHTML = `<img src="${imgURL}"><p>${card.text}</p>`;
+    if (imgURL) {
+      const img = document.createElement("img");
+      img.src = imgURL;
+      div.appendChild(img);
+    }
 
+    // Text label
+    const p = document.createElement("p");
+    p.textContent = card.text;
+    div.appendChild(p);
+
+    // --- Delete button ---
+    const del = document.createElement("button");
+    del.className = "delete-btn";
+    del.textContent = "✖";
+    del.title = "Delete this card";
+    del.addEventListener("click", async (e) => {
+      e.stopPropagation();
+      if (confirm(`Delete "${card.text}"?`)) {
+        const db = await openDB();
+        const tx = db.transaction(STORE, "readwrite");
+        tx.objectStore(STORE).delete(card.id);
+        tx.oncomplete = () => displayCards();
+      }
+    });
+    div.appendChild(del);
+
+    // --- Click to play audio/TTS ---
     div.addEventListener("click", () => playCard(card, div));
+
+    // --- Drag support ---
     div.addEventListener("dragstart", e => {
       e.dataTransfer.setData("text/plain", JSON.stringify({ text: card.text, image: imgURL }));
     });
@@ -261,6 +291,7 @@ async function displayCards() {
     cardContainer.appendChild(div);
   });
 }
+
 
 // ===== Speak / Play =====
 function playCard(card, element) {
