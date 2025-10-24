@@ -51,10 +51,6 @@
     <div id="coreContainer"></div>
   </section>
 
-  <footer id="appFooter">
-  Made with love for my baby Simon ❤️
-</footer>
-  
   <!-- Section 5: Build Sentence (Sticky Dock) -->
   <section id="sentence" class="dock">
     <h2>Build Sentence</h2>
@@ -63,11 +59,11 @@
       <button id="playAll">▶️ Play All</button>
       <button id="clearSentence">🗑️ Clear</button>
     </div>
-    <p id="removeHint">Tip: double-tap a card or press the X to remove it.</p>
+    <p id="removeHint">Tip: long-press or double-tap a card to remove it.</p>
   </section>
 
   <!-- Scripts -->
- <script src="script.js?v=13"></script>
+ <script src="script.js?v=8"></script>
   <script>
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.register("service-worker.js")
@@ -75,10 +71,6 @@
         .catch(err => console.error("SW registration failed:", err));
     }
   </script>
-  <footer id="appFooter">
-  Made with love for my baby Simon ❤️
-</footer>
-
 </body>
 </html>
 
