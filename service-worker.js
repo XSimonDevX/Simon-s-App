@@ -1,5 +1,5 @@
 // Bump this any time you want clients to fetch a fresh bundle
-const CACHE_NAME = "flashcards-v8-idb";
+const CACHE_NAME = "flashcards-v11-idb";
 
 const ASSETS = [
   "./",
