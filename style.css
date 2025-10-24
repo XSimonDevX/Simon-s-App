@@ -347,21 +347,31 @@ body {
 }
 /* === Prevent bottom content from being hidden by sticky dock === */
 body {
-  /* Give enough padding for the sticky bar height */
-  padding-bottom: 220px !important; 
+  /* Extra space for sticky sentence area */
+  padding-bottom: 320px !important;
 }
 
-/* You can also add a little margin below the core words section */
+/* Space below core words so they don't get covered */
 #coreWords {
-  margin-bottom: 120px;
+  margin-bottom: 180px;
 }
 
-/* Adjust automatically for smaller devices */
-@media (max-width: 480px) {
+/* Adjust for smaller screens (phones and tablets) */
+@media (max-width: 768px) {
   body {
-    padding-bottom: 260px !important;
+    padding-bottom: 380px !important;
   }
   #coreWords {
-    margin-bottom: 140px;
+    margin-bottom: 220px;
+  }
+}
+
+/* For very small phones (portrait mode) */
+@media (max-width: 480px) {
+  body {
+    padding-bottom: 420px !important;
+  }
+  #coreWords {
+    margin-bottom: 250px;
   }
 }
