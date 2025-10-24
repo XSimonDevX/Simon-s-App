@@ -577,7 +577,13 @@ const themeSets = {
     { text: "cow",      icon: "🐄" },
     { text: "horse",    icon: "🐎" },
     { text: "snake",    icon: "🐍" }
+  ],
+  shows: [
+    { image: "./img/peppa.png", text: "Peppa Pig", icon: "🐷" },
+    { image: "./img/noddy.png", text: "noddy", icon: "🕷️" },
+   
   ]
+};
 };
 
 
