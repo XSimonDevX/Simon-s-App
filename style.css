@@ -171,6 +171,12 @@ button:disabled {
   color: #fff;
   font-weight: 700;
   font-size: 18px;
+.card .delete-btn {
+  position: absolute;
+  top: 0;
+  right: 0;
+  transform: translate(50%, -50%);
+}
 
   /* center the X perfectly */
   display: flex;
