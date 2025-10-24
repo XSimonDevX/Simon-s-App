@@ -6,7 +6,7 @@ const ASSETS = [
   "./index.html",
   "./style.css",
   // bump the query version whenever script.js changes
-  "./script.js?v=8",
+  "./script.js?v11",
   "./manifest.json",
   "./icon-192.png",
   "./icon-512.png",
