@@ -523,6 +523,7 @@ const themeSets = {
     { image: "./img/socks.png", text: "socks", icon: "🧦" }
   ],
   places: [
+    { image: "./img/beach.png", text: "beach", icon: "🏖" },
     { image: "./img/home.png", text: "home", icon: "🏠" },
     { image: "./img/school.png", text: "school", icon: "🏫" },
     { image: "./img/playground.png", text: "playground", icon: "🛝" },
