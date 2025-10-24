@@ -1,4 +1,4 @@
-/ === ELEMENTS ===
+// === ELEMENTS ===
 const addBtn = document.getElementById("addBtn");
 const imageInput = document.getElementById("imageInput");
 const textInput = document.getElementById("textInput");
