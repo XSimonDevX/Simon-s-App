@@ -345,33 +345,33 @@ body {
   .card img { width: 64px; height: 64px; }
   body { padding-bottom: 200px !important; }
 }
-/* === Prevent bottom content from being hidden by sticky dock === */
+/* === Prevent sticky Build Sentence area from overlapping content === */
 body {
-  /* Extra space for sticky sentence area */
-  padding-bottom: 320px !important;
+  /* Give plenty of scroll space for large sticky dock */
+  padding-bottom: 520px !important;
 }
 
-/* Space below core words so they don't get covered */
+/* Extra margin below Core Words to guarantee visibility */
 #coreWords {
-  margin-bottom: 180px;
+  margin-bottom: 320px;
 }
 
-/* Adjust for smaller screens (phones and tablets) */
+/* Tablet adjustments */
 @media (max-width: 768px) {
   body {
-    padding-bottom: 380px !important;
+    padding-bottom: 600px !important;
   }
   #coreWords {
-    margin-bottom: 220px;
+    margin-bottom: 400px;
   }
 }
 
-/* For very small phones (portrait mode) */
+/* Small phone adjustments */
 @media (max-width: 480px) {
   body {
-    padding-bottom: 420px !important;
+    padding-bottom: 680px !important;
   }
   #coreWords {
-    margin-bottom: 250px;
+    margin-bottom: 480px;
   }
 }
