@@ -347,53 +347,61 @@ body {
 }
 /* === Prevent sticky Build Sentence area from overlapping content === */
 body {
-  /* Give plenty of scroll space for large sticky dock */
-  padding-bottom: 520px !important;
+  padding-bottom: 200px !important; /* Base space for sticky bar */
 }
 
-/* Extra margin below Core Words to guarantee visibility */
+/* Make sure Core Words never get covered */
 #coreWords {
-  margin-bottom: 320px;
+  margin-bottom: 100px;
 }
 
-/* Tablet adjustments */
+/* === Compact Build Sentence dock on tablets/phones === */
 @media (max-width: 768px) {
   body {
-    padding-bottom: 600px !important;
+    padding-bottom: 240px !important;
   }
   #coreWords {
-    margin-bottom: 400px;
+    margin-bottom: 120px;
   }
-}
 
-/* Small phone adjustments */
-@media (max-width: 480px) {
-  body {
-    padding-bottom: 680px !important;
-  }
-  #coreWords {
-    margin-bottom: 480px;
-  }
-}
-/* === Smaller sticky Build Sentence dock on mobile === */
-@media (max-width: 600px) {
   #sentence {
-    transform: scale(0.9);        /* slightly shrink */
-    transform-origin: bottom;     /* shrink from the bottom up */
-    padding: 6px 8px;
+    padding: 8px;
   }
 
   #sentenceArea {
-    min-height: 80px;             /* slightly smaller sentence area */
+    min-height: 80px; /* smaller area for cards */
   }
 
   #sentence h2 {
-    font-size: 16px;              /* smaller title text */
+    font-size: 16px;
     margin-bottom: 4px;
   }
 
   #sentence button {
-    font-size: 14px;              /* smaller buttons */
+    font-size: 15px;
     padding: 6px 10px;
+  }
+}
+
+/* === Even more compact on small phones === */
+@media (max-width: 480px) {
+  body {
+    padding-bottom: 260px !important;
+  }
+  #coreWords {
+    margin-bottom: 140px;
+  }
+
+  #sentence {
+    padding: 6px;
+  }
+
+  #sentenceArea {
+    min-height: 70px;
+  }
+
+  #sentence button {
+    font-size: 14px;
+    padding: 5px 8px;
   }
 }
