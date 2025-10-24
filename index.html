@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simon's App 😎👍</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#007bff">
+</head>
+
+<body>
+  <h1>Simon's App 😎👍</h1>
+
+  <!-- Section 1: Add a New Card -->
+  <section id="add-card">
+    <h2>Add a New Card</h2>
+    <input type="file" id="imageInput" accept="image/*" capture="environment">
+    <input type="text" id="textInput" placeholder="Enter word or phrase">
+    <button id="recordBtn">🎤 Record</button>
+    <button id="stopBtn" disabled>⏹️ Stop</button>
+    <audio id="previewAudio" controls></audio><br>
+    <button id="addBtn">Add Card</button>
+  </section>
+
+  <!-- Section 2: Themed Cards -->
+  <section id="themes">
+    <h2>Choose a Theme</h2>
+    <div id="themeButtons">
+      <button class="themeBtn" data-theme="food">🍎 Food</button>
+      <button class="themeBtn" data-theme="clothes">👕 Clothes</button>
+      <button class="themeBtn" data-theme="places">🏠 Places</button>
+      <button class="themeBtn" data-theme="people">🧍 People</button>
+      <button class="themeBtn" data-theme="colours">🎨 Colours</button>
+      <button class="themeBtn" data-theme="vehicles">🚗 Vehicles</button>
+      <button class="themeBtn" data-theme="feelings">😊 Feelings</button>
+      <button class="themeBtn" data-theme="animals">🐾 Animals</button>
+    </div>
+    <div id="themeContainer"></div>
+  </section>
+
+  <!-- Section 3: Custom Cards -->
+  <section id="library">
+    <h2>My Cards</h2>
+    <div id="cardContainer"></div>
+  </section>
+
+  <!-- Section 4: Core Words -->
+  <section id="coreWords">
+    <h2>Core Words</h2>
+    <div id="coreContainer"></div>
+  </section>
+
+  <!-- Section 5: Build Sentence (Sticky Dock) -->
+  <section id="sentence" class="dock">
+    <h2>Build Sentence</h2>
+    <div id="sentenceArea" class="dropzone"></div>
+    <div class="dock-buttons">
+      <button id="playAll">▶️ Play All</button>
+      <button id="clearSentence">🗑️ Clear</button>
+    </div>
+    <p id="removeHint">Tip: long-press or double-tap a card to remove it.</p>
+  </section>
+
+  <!-- Scripts -->
+  <script src="script.js?v=3"></script>
+  <script>
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("service-worker.js")
+        .then(() => console.log("Service Worker Registered"))
+        .catch(err => console.error("SW registration failed:", err));
+    }
+  </script>
+</body>
+</html>
+

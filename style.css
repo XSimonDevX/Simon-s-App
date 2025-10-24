@@ -1,0 +1,347 @@
+body {
+  font-family: Arial, sans-serif;
+  background: #f9fafc;
+  color: #333;
+  text-align: center;
+  padding: 10px;
+}
+
+section {
+  margin: 20px auto;
+  max-width: 420px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,.1);
+  padding: 16px;
+}
+
+h2 {
+  margin-bottom: 10px;
+}
+
+#cardContainer, #themeContainer, #sentenceArea, #coreContainer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  min-height: 100px;
+  padding: 10px;
+  border: 2px dashed #ccc;
+  border-radius: 10px;
+}
+
+.card, .core-card {
+  width: 100px;
+  height: 120px;
+  border-radius: 10px;
+  background: #e6f2ff;
+  overflow: hidden;
+  cursor: grab;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  -webkit-user-drag: element;
+}
+
+.card img {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 5px;
+}
+
+.card p {
+  margin: 5px 0 0 0;
+  font-size: 16px;
+}
+
+.core-card {
+  width: 80px;
+  height: 80px;
+  background: #ffe6e6;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+button {
+  margin-top: 8px;
+  padding: 8px 12px;
+  border: none;
+  background: #007bff;
+  color: #fff;
+  border-radius: 6px;
+  font-size: 16px;
+}
+
+button:disabled {
+  opacity: .55;
+}
+
+#themeButtons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.themeBtn {
+  background: #28a745;
+  border: none;
+  padding: 8px 12px;
+  color: #fff;
+  border-radius: 6px;
+  font-size: 16px;
+}
+
+.playing {
+  border: 3px solid #007bff;
+  box-shadow: 0 0 10px #007bff;
+}
+
+/* Draggable sentence card appearance */
+#sentenceArea .card.dragging {
+  opacity: 0.6;
+}
+
+/* === THEMED CARDS (emoji-centered layout) === */
+#themeContainer .card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background: #e6f2ff;
+  border-radius: 10px;
+  width: 100px;
+  height: 120px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+}
+
+/* Make the emoji large and centered */
+#themeContainer .card .badge {
+  position: static;
+  font-size: 64px; /* big emoji */
+  background: none;
+  box-shadow: none;
+  margin-bottom: 6px;
+}
+
+/* Show the text clearly below the emoji */
+#themeContainer .card p {
+  display: block !important;
+  font-size: 20px;
+  font-weight: bold;
+  color: #222;
+  margin: 0;
+}
+
+/* Hide the image inside themed cards (emoji replaces it) */
+#themeContainer .card img {
+  display: none;
+}
+/* === Touch-friendly delete button on sentence cards === */
+#sentenceArea .card {
+  position: relative;
+  overflow: visible; /* ensures button isn't clipped */
+}
+
+/* === Delete button: true top-right + perfectly centered === */
+#sentenceArea .card {
+  position: relative;
+  overflow: visible; /* so the button can sit slightly outside */
+}
+
+#sentenceArea .card .delete-btn {
+  position: absolute;
+  top: 0;
+  right: 0;
+  transform: translate(50%, -50%); /* anchor to outer corner */
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 50%;
+  background: #ff4d4d;
+  color: #fff;
+  font-weight: 700;
+  font-size: 18px;
+
+  /* center the X perfectly */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  box-shadow: 0 1px 4px rgba(0,0,0,.25);
+  -webkit-tap-highlight-color: transparent;
+  z-index: 5;
+  opacity: 0.95;
+  transition: transform .12s ease, opacity .12s ease;
+}
+
+#sentenceArea .card .delete-btn:active {
+  transform: translate(50%, -50%) scale(0.92);
+  opacity: 1;
+}
+/* === Ensure all card text fits nicely === */
+.card p,
+#themeContainer .card p {
+  margin: 4px 4px 0 4px;
+  font-size: clamp(16px); /* responsive scaling */
+  font-weight: bold;
+  color: #222;
+  text-align: center;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  line-height: 1.1;
+  max-width: 90%;
+  white-space: normal;
+}
+/* Clean, readable labels that never clip */
+#themeContainer .card p,
+#cardContainer .card p,
+#sentenceArea .card p {
+  margin: 4px 6px 0 6px;
+  font-size: 18px;          /* readable default */
+  font-weight: 700;
+  color: #222;
+  line-height: 1.15;
+  text-align: center;
+
+  /* allow neat wrapping to max 2 lines */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;    /* up to two lines */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: clip;      /* no ellipsis bubble */
+  word-break: break-word;   /* break very long words */
+  max-width: 92%;
+}
+
+/* leave a tiny bit more room between emoji/image and text */
+#themeContainer .card .badge { margin-bottom: 8px; }
+/* === FORCE LABELS TO FIT (no clipping) === */
+#themeContainer .card p,
+#cardContainer .card p,
+#sentenceArea .card p {
+  display: block !important;
+  margin: 6px 8px 0 8px !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+
+  /* wrap instead of clip */
+  white-space: normal !important;
+  word-break: break-word !important;
+  overflow-wrap: anywhere !important;
+  overflow: visible !important;
+
+  /* readable size but flexible */
+  font-size: 18px !important;         /* base */
+  line-height: 1.15 !important;
+  font-weight: 700 !important;
+  color: #222 !important;
+  text-align: center !important;
+
+  /* allow up to 2 lines inside the card width */
+  max-width: 100% !important;
+}
+
+/* give theme cards a bit more headroom for 2 lines */
+#themeContainer .card {
+  padding-top: 6px !important;
+}
+
+/* keep emoji centered with some gap above the text */
+#themeContainer .card .badge {
+  margin-bottom: 8px !important;
+}
+/* === Smart auto-shrink labels === */
+#themeContainer .card p,
+#cardContainer .card p,
+#sentenceArea .card p {
+  margin: 4px 6px 0 6px;
+  font-weight: 700;
+  color: #222;
+  line-height: 1.1;
+  text-align: center;
+  white-space: nowrap;       /* keep on one line */
+  overflow: hidden;          /* hide overflow until shrunk */
+  max-width: 90%;
+  font-size: 18px;           /* default starting size */
+  transition: font-size 0.15s ease;
+}
+/* === FINAL OVERRIDE: Smaller card text === */
+body #themeContainer .card p,
+body #cardContainer .card p,
+body #sentenceArea .card p {
+  font-size: 15px !important;  /* try 15 or 14 if you want smaller */
+  line-height: 1.1 !important;
+  font-weight: 700 !important;
+  color: #222 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: clip !important;
+  text-align: center !important;
+}
+/* === Sticky "Build Sentence" dock (universal desktop + mobile) === */
+#sentence.dock {
+  position: fixed !important;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  background: #fffffffa;           /* white with tiny transparency */
+  backdrop-filter: blur(4px);
+  border-top: 2px solid #ddd;
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.1);
+  padding: 10px 10px 14px;
+  z-index: 9999;                   /* ensure it sits above everything */
+}
+
+/* Keep the page content from being hidden behind it */
+body {
+  padding-bottom: 180px !important;
+}
+
+/* Sentence area inside dock — horizontal scroll */
+#sentenceArea.dropzone {
+  border: 2px dashed #ccc;
+  border-radius: 10px;
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  padding: 10px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  background: #fff;
+}
+
+/* Dock buttons next to each other */
+.dock-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.dock-buttons button {
+  flex: 1;
+  max-width: 140px;
+  font-size: 18px;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+/* Smaller cards for tighter space on phones */
+@media (max-width: 480px) {
+  .card, .core-card { width: 80px; height: 100px; }
+  .card img { width: 64px; height: 64px; }
+  body { padding-bottom: 200px !important; }
+}
