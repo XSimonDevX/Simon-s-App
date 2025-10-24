@@ -543,8 +543,9 @@ const themeSets = {
     { text: "yellow", icon: "🟨" },
     { text: "purple", icon: "🟪" },
     { text: "orange", icon: "🟧" },
-    { text: "black",  icon: "⬛"  },
-    { text: "white",  icon: "⬜"  }
+    { text: "black",  icon: "⬛" },
+    { text: "white",  icon: "⬜" },
+    { text: "brown",  icon: "🟫" }
   ],
   vehicles: [
     { text: "car",      icon: "🚗" },
