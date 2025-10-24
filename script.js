@@ -526,7 +526,7 @@ const themeSets = {
     { image: "./img/home.png", text: "home", icon: "🏠" },
     { image: "./img/school.png", text: "school", icon: "🏫" },
     { image: "./img/playground.png", text: "playground", icon: "🛝" },
-    { image: "./img/store.png", text: "store", icon: "🛒" }
+    { image: "./img/store.png", text: "shop", icon: "🛒" }
   ],
   people: [
     { image: "./img/boy.png", text: "boy", icon: "👦🏻" },
