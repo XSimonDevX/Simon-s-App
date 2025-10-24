@@ -35,6 +35,10 @@ const ASSETS = [
   "./img/mom.png",
   "./img/dad.png",
   "./img/grandma.png"
+
+  "./img/noddy.png",
+  "./img/peppa.png",
+  
 ];
 
 self.addEventListener("install", (event) => {
