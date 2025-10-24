@@ -375,3 +375,25 @@ body {
     margin-bottom: 480px;
   }
 }
+/* === Smaller sticky Build Sentence dock on mobile === */
+@media (max-width: 600px) {
+  #sentence {
+    transform: scale(0.9);        /* slightly shrink */
+    transform-origin: bottom;     /* shrink from the bottom up */
+    padding: 6px 8px;
+  }
+
+  #sentenceArea {
+    min-height: 80px;             /* slightly smaller sentence area */
+  }
+
+  #sentence h2 {
+    font-size: 16px;              /* smaller title text */
+    margin-bottom: 4px;
+  }
+
+  #sentence button {
+    font-size: 14px;              /* smaller buttons */
+    padding: 6px 10px;
+  }
+}
