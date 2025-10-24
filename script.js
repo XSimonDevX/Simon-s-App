@@ -1,4 +1,4 @@
-// === ELEMENTS ===
+/ === ELEMENTS ===
 const addBtn = document.getElementById("addBtn");
 const imageInput = document.getElementById("imageInput");
 const textInput = document.getElementById("textInput");
@@ -523,11 +523,10 @@ const themeSets = {
     { image: "./img/socks.png", text: "socks", icon: "🧦" }
   ],
   places: [
-    { image: "./img/beach.png", text: "beach", icon: "🏖️" },
     { image: "./img/home.png", text: "home", icon: "🏠" },
     { image: "./img/school.png", text: "school", icon: "🏫" },
     { image: "./img/playground.png", text: "playground", icon: "🛝" },
-    { image: "./img/shop.png", text: "shop", icon: "🛒" }
+    { image: "./img/store.png", text: "store", icon: "🛒" }
   ],
   people: [
     { image: "./img/boy.png", text: "boy", icon: "👦🏻" },
@@ -577,6 +576,7 @@ const themeSets = {
     { text: "cow",      icon: "🐄" },
     { text: "horse",    icon: "🐎" },
     { text: "snake",    icon: "🐍" }
+  ]
 };
 
 
