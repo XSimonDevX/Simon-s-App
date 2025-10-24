@@ -619,3 +619,21 @@ if (voiceSelect) {
   await displayCards();
   displayCoreWords();
 })();
+// === AUTO-PADDING FOR STICKY SENTENCE BUILDER ===
+function adjustBottomPadding() {
+  const sentenceSection = document.getElementById("sentence");
+  if (!sentenceSection) return;
+
+  const dockHeight = sentenceSection.offsetHeight;
+  // Add a bit extra space for safety
+  const padding = dockHeight + 40;
+  document.body.style.paddingBottom = `${padding}px`;
+}
+
+// Adjust on load, resize, and whenever content changes
+window.addEventListener("load", adjustBottomPadding);
+window.addEventListener("resize", adjustBottomPadding);
+new MutationObserver(adjustBottomPadding).observe(
+  document.body,
+  { childList: true, subtree: true }
+);
