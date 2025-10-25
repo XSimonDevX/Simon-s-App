@@ -903,6 +903,37 @@ function fitBodyBelowNav(){
 window.addEventListener('load', fitBodyBelowNav);
 window.addEventListener('resize', () => setTimeout(fitBodyBelowNav, 50));
 
+
+// --- Safety shim: make sure window.coreWords is an array of {text,...} ---
+(function ensureCoreWordsArray(){
+  // prefer an existing global
+  let cw = window.coreWords;
+
+  if (Array.isArray(cw)) {
+    // looks good
+    return;
+  }
+
+  if (cw && typeof cw === "object") {
+    // convert object/dictionary into array
+    const arr = Object.values(cw).map(v => {
+      if (typeof v === "string") return { text: v };
+      if (v && typeof v === "object" && "text" in v) return v;
+      return { text: String(v) };
+    });
+    window.coreWords = arr;
+    return;
+  }
+
+  // fallback: define minimal list so UI still works
+  window.coreWords = [
+    { text: "I" }, { text: "you" }, { text: "me" },
+    { text: "want" }, { text: "go" }, { text: "help" },
+    { text: "yes" }, { text: "no" }, { text: "now" }, { text: "later" }
+  ];
+})();
+
+
 /* ======================
    QUICK WORDS + PICKER
    ====================== */
