@@ -614,7 +614,7 @@ function showTheme(set) {
 // ===== Core words =====
 const coreContainer = document.getElementById("coreContainer");
 const coreWords = [
-  { text: "I" }, { text: "want" }, { text: "help" },{ text: "Toilet" },{ text: "Noddy" },
+  { text: "I" }, { text: "want" }, { text: "help" },{ text: "toilet" },{ text: "Noddy" },
   { text: "yes" }, { text: "no" }, { text: "you" }, { text: "me" }, 
   { text: "yesterday" }, { text: "tomorrow" }, { text: "sorry" }, { text: "thank you" }
 ];
