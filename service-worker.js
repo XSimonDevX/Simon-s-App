@@ -1,12 +1,12 @@
 // Bump this any time you want clients to fetch a fresh bundle
-const CACHE_NAME = "flashcards-v28-idb";
+const CACHE_NAME = "flashcards-v29-idb";
 
 const ASSETS = [
   "./",
   "./index.html",
   "./style.css",
   // bump the query version whenever script.js changes
-  "./script.js?v=28",
+  "./script.js?v=29",
   "./manifest.json",
   "./icon-192.png",
   "./icon-512.png",
