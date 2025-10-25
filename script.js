@@ -792,6 +792,13 @@ window.addEventListener("load", () => {
   showPanel(saved);
 });
 
+function updateTopbarHeightVar() {
+  const h = document.getElementById('topBar')?.offsetHeight || 120;
+  document.documentElement.style.setProperty('--topbar-h', h + 'px');
+}
+window.addEventListener('load', updateTopbarHeightVar);
+window.addEventListener('resize', () => setTimeout(updateTopbarHeightVar, 50));
+
 
 // ===== INIT =====
 (async function init() {
