@@ -484,3 +484,18 @@ section h2 { display: inline-block; }
   #topBar .tabBtn .label { font-size: 15px; }
 }
 
+:root { --topbar-h: 120px; } /* will be updated by JS for exact height */
+
+#topBar {
+  position: fixed;      /* was sticky */
+  top: 0; left: 0; right: 0;
+  z-index: 10000;
+}
+
+/* Push the whole page down so content never hides under the bar */
+body {
+  padding-top: calc(var(--topbar-h) + 12px);
+}
+
+/* Optional: a subtle shadow so the bar feels layered */
+#topBar { box-shadow: 0 2px 10px rgba(0,0,0,.06); }
