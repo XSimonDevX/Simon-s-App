@@ -903,6 +903,153 @@ function fitBodyBelowNav(){
 window.addEventListener('load', fitBodyBelowNav);
 window.addEventListener('resize', () => setTimeout(fitBodyBelowNav, 50));
 
+/* ======================
+   QUICK WORDS + PICKER
+   ====================== */
+
+// 1) Quick Words: small, always available chips
+const QUICK_WORDS = [
+  "I","you","me","want","go","help","more","all done","yes","no","now","later","thank you"
+];
+
+function renderQuickWords() {
+  const strip = document.getElementById("quickStrip");
+  if (!strip) return;
+  strip.innerHTML = "";
+  QUICK_WORDS.forEach(t => {
+    const chip = document.createElement("button");
+    chip.className = "qw-chip";
+    chip.textContent = t;
+    chip.draggable = true;
+
+    // click = add immediately
+    chip.addEventListener("click", () => addToSentence({ text: t }));
+
+    // drag into sentence area
+    chip.addEventListener("dragstart", (e) => {
+      e.dataTransfer.setData("text/plain", JSON.stringify({ text: t }));
+    });
+
+    strip.appendChild(chip);
+  });
+}
+
+// 2) Picker drawer: tabs Core / Themes / My Cards
+const picker     = document.getElementById("builderPicker");
+const pickerGrid = document.getElementById("pickerGrid");
+const themeBtnsHost = document.getElementById("pickerThemeButtons");
+
+function openPicker(tab="core") {
+  if (!picker) return;
+  picker.classList.remove("hidden");
+  picker.setAttribute("aria-hidden", "false");
+  setActivePickerTab(tab);
+  renderPickerTab(tab);
+}
+function closePicker() {
+  if (!picker) return;
+  picker.classList.add("hidden");
+  picker.setAttribute("aria-hidden", "true");
+}
+function setActivePickerTab(tab) {
+  document.querySelectorAll(".pickTab").forEach(b=>{
+    b.classList.toggle("active", b.dataset.tab === tab);
+  });
+}
+
+async function renderPickerTab(tab) {
+  if (!pickerGrid) return;
+  pickerGrid.innerHTML = "";
+  themeBtnsHost.innerHTML = "";
+
+  if (tab === "core") {
+    // render all core words as small tiles
+    coreWords.forEach(w => {
+      const div = document.createElement("div");
+      div.className = "picker-item";
+      div.innerHTML = `<p>${w.text}</p>`;
+      div.draggable = true;
+      div.addEventListener("click", () => addToSentence({ text: w.text }));
+      div.addEventListener("dragstart", e => {
+        e.dataTransfer.setData("text/plain", JSON.stringify({ text: w.text }));
+      });
+      pickerGrid.appendChild(div);
+    });
+  }
+
+  if (tab === "themes") {
+    // build mini theme buttons then show default (food)
+    const labels = { food:"🍎 Food", clothes:"👕 Clothes", places:"🏠 Places",
+                     people:"🧍 People", colours:"🎨 Colours", vehicles:"🚗 Vehicles",
+                     feelings:"😊 Feelings", animals:"🐾 Animals" };
+    Object.keys(themeSets).forEach(key => {
+      const b = document.createElement("button");
+      b.className = "miniThemeBtn";
+      b.textContent = labels[key] || key;
+      b.addEventListener("click", ()=> renderThemeSetInPicker(themeSets[key]));
+      themeBtnsHost.appendChild(b);
+    });
+    renderThemeSetInPicker(themeSets.food);
+  }
+
+  if (tab === "cards") {
+    // load custom cards from IndexedDB
+    const cards = await getAllCardsFromDB();
+    cards.forEach(card => {
+      const div = document.createElement("div");
+      div.className = "picker-item";
+      const hasImg = !!card.imageBlob;
+      div.innerHTML = `
+        ${hasImg ? `<img src="${URL.createObjectURL(card.imageBlob)}" alt="${card.text}">` : ""}
+        <p>${card.text}</p>`;
+      div.draggable = true;
+
+      div.addEventListener("click", () => addToSentence(card));
+      div.addEventListener("dragstart", e => {
+        e.dataTransfer.setData("text/plain", JSON.stringify({ text: card.text }));
+      });
+
+      pickerGrid.appendChild(div);
+    });
+  }
+}
+
+function renderThemeSetInPicker(set) {
+  pickerGrid.innerHTML = "";
+  set.forEach(card => {
+    const div = document.createElement("div");
+    div.className = "picker-item";
+    const hasImg = !!card.image;
+    div.innerHTML = `
+      ${hasImg ? `<img src="${card.image}" alt="${card.text||""}">` : ""}
+      <p>${card.text || ""}</p>`;
+    div.draggable = true;
+
+    // click/tap adds to sentence
+    div.addEventListener("click", () => addToSentence(card));
+    // support drag into sentence
+    div.addEventListener("dragstart", e => {
+      e.dataTransfer.setData("text/plain", JSON.stringify(card));
+    });
+
+    pickerGrid.appendChild(div);
+  });
+}
+
+// 3) Wire up buttons
+document.getElementById("togglePicker")?.addEventListener("click", () => openPicker("core"));
+document.getElementById("closePicker")?.addEventListener("click", closePicker);
+document.querySelectorAll(".pickTab").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const tab = btn.dataset.tab;
+    setActivePickerTab(tab);
+    renderPickerTab(tab);
+  });
+});
+
+// 4) Initialize ribbon on load
+window.addEventListener("load", renderQuickWords);
+
 
 // ===== INIT =====
 (async function init() {
