@@ -558,11 +558,92 @@ const themeSets = {
 };
 
 
+// === Themes wiring (no HTML buttons needed) ===
 const themeContainer = document.getElementById("themeContainer");
-const themeButtons = document.querySelectorAll(".themeBtn");
-themeButtons.forEach(btn =>
-  btn.addEventListener("click", () => showTheme(themeSets[btn.dataset.theme]))
-);
+
+// Build the theme category buttons dynamically (at runtime)
+function renderThemeButtons() {
+  const themesSection = document.getElementById("themes");
+  if (!themesSection) return;
+
+  // Create a host row if it's missing
+  let host = document.getElementById("themeButtons");
+  if (!host) {
+    host = document.createElement("div");
+    host.id = "themeButtons";
+    themesSection.insertBefore(host, themeContainer);
+  }
+
+  // Pretty labels with emojis
+  const label = {
+    food: "🍎 Food",
+    clothes: "👕 Clothes",
+    places: "🏠 Places",
+    people: "🧍 People",
+    colours: "🎨 Colours",
+    vehicles: "🚗 Vehicles",
+    feelings: "😊 Feelings",
+    animals: "🐾 Animals",
+  };
+
+  host.innerHTML = "";
+  Object.keys(themeSets).forEach((key) => {
+    const btn = document.createElement("button");
+    btn.className = "themeBtn";
+    btn.dataset.theme = key;
+    btn.textContent = label[key] || key;
+    btn.addEventListener("click", () => showTheme(themeSets[key]));
+    host.appendChild(btn);
+  });
+}
+
+// Render one theme’s cards (works for emoji-only sets too)
+function showTheme(set) {
+  themeContainer.innerHTML = "";
+  set.forEach((card) => {
+    const div = document.createElement("div");
+    div.className = "card";
+    div.draggable = true;
+
+    const hasImg = !!card.image;
+    div.innerHTML = `
+      ${hasImg ? `<img src="${card.image}" alt="${card.text || ""}">` : ""}
+      <p>${card.text || ""}</p>
+      <div class="badge">${card.icon || ""}</div>
+    `;
+
+    // Speak on tap (if text exists)
+    div.addEventListener("click", () => {
+      if (card.text) speechSynthesis.speak(new SpeechSynthesisUtterance(card.text));
+    });
+
+    // Enable drag into sentence area
+    div.addEventListener("dragstart", (e) => {
+      e.dataTransfer.setData("text/plain", JSON.stringify(card));
+    });
+
+    themeContainer.appendChild(div);
+  });
+}
+
+// Ensure buttons exist and a default category shows (Food)
+function ensureThemesReady() {
+  renderThemeButtons();
+  if (!themeContainer.children.length) {
+    showTheme(themeSets.food);
+  }
+}
+
+// 1) Prepare on page load
+window.addEventListener("load", ensureThemesReady);
+
+// 2) Also prepare whenever the user opens the Themes panel via top nav
+document.addEventListener("click", (e) => {
+  const btn = e.target.closest(".tabBtn");
+  if (btn && btn.dataset.target === "themes") {
+    ensureThemesReady();
+  }
+});
 
 function showTheme(set) {
   themeContainer.innerHTML = "";
