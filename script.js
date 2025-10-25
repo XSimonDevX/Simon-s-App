@@ -554,7 +554,54 @@ const themeSets = {
     { text: "cow",      icon: "🐄" },
     { text: "horse",    icon: "🐎" },
     { text: "snake",    icon: "🐍" }
+  ],
+  // NEW: Body parts
+  bodyparts: [
+    { text: "head",   icon: "🙂" },
+    { text: "hair",   icon: "💇" },
+    { text: "eyes",   icon: "👀" },
+    { text: "ear",    icon: "👂" },
+    { text: "nose",   icon: "👃" },
+    { text: "mouth",  icon: "👄" },
+    { text: "teeth",  icon: "🦷" },
+    { text: "tongue", icon: "👅" },
+    { text: "hand",   icon: "✋" },
+    { text: "arm",    icon: "💪" },
+    { text: "leg",    icon: "🦵" },
+    { text: "foot",   icon: "🦶" },
+    { text: "tummy",  icon: "🧍" },
+    { text: "back",   icon: "🧍‍♂️" }
+  ],
+
+  // NEW: Activities
+  activities: [
+    { text: "eat",   icon: "🍽️" },
+    { text: "drink", icon: "🥤" },
+    { text: "sleep", icon: "😴" },
+    { text: "read",  icon: "📖" },
+    { text: "draw",  icon: "✏️" },
+    { text: "play",  icon: "🧸" },
+    { text: "sing",  icon: "🎤" },
+    { text: "dance", icon: "💃" },
+    { text: "run",   icon: "🏃" },
+    { text: "jump",  icon: "🤸" },
+    { text: "swim",  icon: "🏊" },
+    { text: "watch", icon: "📺" }
+  ],
+
+  // NEW: Sports
+  sports: [
+    { text: "football",     icon: "⚽" },
+    { text: "basketball", icon: "🏀" },
+    { text: "baseball",   icon: "⚾" },
+    { text: "tennis",     icon: "🎾" },
+    { text: "rugby",      icon: "🏉" },
+    { text: "swimming",   icon: "🏊" },
+    { text: "cycling",    icon: "🚴" },
+    { text: "skating",    icon: "⛸️" },
+    { text: "skiing",     icon: "🎿" }
   ]
+  
 };
 
 
