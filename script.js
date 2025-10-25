@@ -613,34 +613,59 @@ function showTheme(set) {
 
 // ===== Core words =====
 const coreContainer = document.getElementById("coreContainer");
-const coreWords = [
-  { text: "I" }, { text: "want" }, { text: "help" },{ text: "toilet" },{ text: "Noddy" },
-  { text: "yes" }, { text: "no" }, { text: "you" }, { text: "me" }, 
-  { text: "yesterday" }, { text: "tomorrow" }, { text: "sorry" }, { text: "thank you" }
-];
-const colorMap = {
-  I: "#b3d9ff", you: "#b3d9ff", me: "#b3d9ff",
-  want: "#b3ffb3", help: "#b3ffb3",
-  yes: "#fff4b3", no: "#fff4b3"
+
+// Type palette (edit colors if you like)
+const typeColor = {
+  pronoun:  "#b3d9ff", // light blue
+  verb:     "#b3ffb3", // light green
+  adjective:"#f6c6ff", // light pink/purple
+  time:     "#ffd59e", // orange
+  quantity: "#fff4b3", // pale yellow
+  social:   "#ffd1dc", // rose
+  place:    "#cde7ff", // sky blue
+  need:     "#ffe6cc", // peach
+  personal: "#e6e6ff"  // lavender
 };
 
-function displayCoreWords() {
-  coreContainer.innerHTML = "";
-  coreWords.forEach(word => {
-    const div = document.createElement("div");
-    div.className = "core-card";
-    div.textContent = word.text;
-    div.style.background = colorMap[word.text] || "#ffe6e6";
-    div.draggable = true;
-    div.addEventListener("click", () =>
-      speechSynthesis.speak(new SpeechSynthesisUtterance(word.text))
-    );
-    div.addEventListener("dragstart", (e) =>
-      e.dataTransfer.setData("text/plain", JSON.stringify(word))
-    );
-    coreContainer.appendChild(div);
-  });
-}
+const coreWords = [
+  // pronouns
+  { text: "I", type: "pronoun" }, { text: "you", type: "pronoun" },
+  { text: "me", type: "pronoun" }, { text: "it", type: "pronoun" },
+
+  // verbs (actions)
+  { text: "want", type: "verb" }, { text: "go", type: "verb" },
+  { text: "stop", type: "verb" }, { text: "look", type: "verb" },
+  { text: "see", type: "verb" }, { text: "play", type: "verb" },
+  { text: "help", type: "verb" }, { text: "like", type: "verb" },
+
+  // adjectives (describing)
+  { text: "big", type: "adjective" }, { text: "small", type: "adjective" },
+  { text: "fast", type: "adjective" }, { text: "slow", type: "adjective" },
+  { text: "happy", type: "adjective" }, { text: "sad", type: "adjective" },
+  { text: "tired", type: "adjective" }, { text: "nice", type: "adjective" },
+
+  // time & tense
+  { text: "now", type: "time" }, { text: "before", type: "time" },
+  { text: "after", type: "time" }, { text: "yesterday", type: "time" },
+  { text: "today", type: "time" }, { text: "tomorrow", type: "time" },
+  { text: "was", type: "time" }, { text: "will", type: "time" }, { text: "later", type: "time" },
+
+  // quantity / control
+  { text: "more", type: "quantity" }, { text: "all done", type: "quantity" },
+  { text: "one", type: "quantity" }, { text: "two", type: "quantity" },
+
+  // social
+  { text: "yes", type: "social" }, { text: "no", type: "social" },
+  { text: "thank you", type: "social" }, { text: "sorry", type: "social" },
+
+  // places & needs
+  { text: "home", type: "place" }, { text: "school", type: "place" },
+  { text: "toilet", type: "need" },
+
+  // personal/favourite
+  { text: "Noddy", type: "personal" }
+];
+
 // === AUTO-SHRINK LABELS TO FIT ONE LINE ===
 function shrinkToFit(p) {
   if (!p) return;
