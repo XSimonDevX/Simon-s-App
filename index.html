@@ -54,15 +54,46 @@
     <div id="coreContainer"></div>
   </section>
 
-  <section id="sentence" class="panel">
-    <h2>Build a Sentence</h2>
-    <button class="panelClose" data-close="sentence">✖</button>
-    <div id="sentenceArea" class="drop-zone"></div>
-    <div class="sentenceControls">
-      <button id="playAll">▶️ Play All</button>
-      <button id="clearSentence">🗑️ Clear</button>
+ <section id="sentence" class="panel">
+  <h2>Build a Sentence</h2>
+  <button class="panelClose" data-close="sentence">✖</button>
+
+  <!-- Quick words ribbon -->
+  <div id="quickWords">
+    <div class="qw-head">
+      <strong>Quick words</strong>
+      <button id="togglePicker" type="button">More…</button>
     </div>
-  </section>
+    <div id="quickStrip" class="qw-strip"></div>
+  </div>
+
+  <!-- Picker drawer (hidden by default) -->
+  <div id="builderPicker" class="picker hidden" aria-hidden="true">
+    <div class="picker-bar">
+      <div class="picker-tabs">
+        <button class="pickTab active" data-tab="core" type="button">Core</button>
+        <button class="pickTab" data-tab="themes" type="button">Themes</button>
+        <button class="pickTab" data-tab="cards" type="button">My Cards</button>
+      </div>
+      <button id="closePicker" class="picker-close" type="button" aria-label="Close">✖</button>
+    </div>
+
+    <!-- Mini theme buttons appear here when 'Themes' is active -->
+    <div id="pickerThemeButtons" class="miniThemeBtns"></div>
+
+    <!-- Grid that shows Core words / Theme items / My Cards -->
+    <div id="pickerGrid" class="picker-grid"></div>
+  </div>
+
+  <!-- Sentence area -->
+  <div id="sentenceArea" class="dropzone"></div>
+
+  <div class="sentenceControls">
+    <button id="playAll">▶️ Play All</button>
+    <button id="clearSentence">🗑️ Clear</button>
+  </div>
+</section>
+
 
   <footer>
     <p>Made with love for my baby Simon ❤️</p>
