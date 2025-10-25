@@ -12,18 +12,19 @@
 <body>
   <h1>Simon's App 😎👍</h1>
 
+  <!-- === Top Buttons Bar === -->
   <nav id="topBar" aria-label="Main sections">
-  <button class="tabBtn" data-target="add-card" aria-controls="add-card" aria-expanded="false">➕ Add</button>
-  <button class="tabBtn" data-target="themes" aria-controls="themes" aria-expanded="false">🎨 Themes</button>
-  <button class="tabBtn" data-target="library" aria-controls="library" aria-expanded="false">🗂️ My Cards</button>
-  <button class="tabBtn" data-target="coreWords" aria-controls="coreWords" aria-expanded="false">💬 Core Words</button>
-  <button class="tabBtn" data-target="sentence" aria-controls="sentence" aria-expanded="false">🧱 Build</button>
-</nav>
-
+    <button class="tabBtn" data-target="add-card" aria-controls="add-card" aria-expanded="false">➕ Add</button>
+    <button class="tabBtn" data-target="themes" aria-controls="themes" aria-expanded="false">🎨 Themes</button>
+    <button class="tabBtn" data-target="library" aria-controls="library" aria-expanded="false">🗂️ My Cards</button>
+    <button class="tabBtn" data-target="coreWords" aria-controls="coreWords" aria-expanded="false">💬 Core Words</button>
+    <button class="tabBtn" data-target="sentence" aria-controls="sentence" aria-expanded="false">🧱 Build</button>
+  </nav>
 
   <!-- Section 1: Add a New Card -->
-  <section id="add-card">
+  <section id="add-card" class="panel">
     <h2>Add a New Card</h2>
+    <button class="panelClose" data-close="add-card" aria-label="Close panel">✖</button>
     <input type="file" id="imageInput" accept="image/*" capture="environment">
     <input type="text" id="textInput" placeholder="Enter word or phrase">
     <button id="recordBtn">🎤 Record</button>
@@ -33,8 +34,9 @@
   </section>
 
   <!-- Section 2: Themed Cards -->
-  <section id="themes">
+  <section id="themes" class="panel">
     <h2>Choose a Theme</h2>
+    <button class="panelClose" data-close="themes" aria-label="Close panel">✖</button>
     <div id="themeButtons">
       <button class="themeBtn" data-theme="food">🍎 Food</button>
       <button class="themeBtn" data-theme="clothes">👕 Clothes</button>
@@ -49,24 +51,27 @@
   </section>
 
   <!-- Section 3: Custom Cards -->
-  <section id="library">
+  <section id="library" class="panel">
     <h2>My Cards</h2>
+    <button class="panelClose" data-close="library" aria-label="Close panel">✖</button>
     <div id="cardContainer"></div>
   </section>
 
   <!-- Section 4: Core Words -->
-  <section id="coreWords">
+  <section id="coreWords" class="panel">
     <h2>Core Words</h2>
+    <button class="panelClose" data-close="coreWords" aria-label="Close panel">✖</button>
     <div id="coreContainer"></div>
   </section>
 
-<footer id="appFooter">
-  Made with love for my baby Simon ❤️
-</footer>
-  
+  <footer id="appFooter">
+    Made with love for my baby Simon ❤️
+  </footer>
+
   <!-- Section 5: Build Sentence (Sticky Dock) -->
-  <section id="sentence" class="dock">
+  <section id="sentence" class="panel dock">
     <h2>Build Sentence</h2>
+    <button class="panelClose" data-close="sentence" aria-label="Close panel">✖</button>
     <div id="sentenceArea" class="dropzone"></div>
     <div class="dock-buttons">
       <button id="playAll">▶️ Play All</button>
@@ -76,7 +81,7 @@
   </section>
 
   <!-- Scripts -->
- <script src="script.js?v=20"></script>
+  <script src="script.js?v=21"></script>
   <script>
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.register("service-worker.js")
