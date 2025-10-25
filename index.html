@@ -13,16 +13,16 @@
     <h1>Simon’s App 😎👍</h1>
   </header>
 
-  <!-- Fixed Top Navigation -->
   <nav id="topBar" aria-label="Main sections">
-    <div class="topBar-inner">
-      <button class="tabBtn" data-target="add-card"><span class="emoji">➕</span><span class="label">Add</span></button>
-      <button class="tabBtn" data-target="themes"><span class="emoji">🍩</span><span class="label">Themes</span></button>
-      <button class="tabBtn" data-target="library"><span class="emoji">📁</span><span class="label">My Cards</span></button>
-      <button class="tabBtn" data-target="coreWords"><span class="emoji">💬</span><span class="label">Core Words</span></button>
-      <button class="tabBtn" data-target="sentence"><span class="emoji">🧱</span><span class="label">Build</span></button>
-    </div>
-  </nav>
+  <div class="topBar-inner">
+    <button class="tabBtn" data-target="add-card" aria-controls="add-card" aria-expanded="false"><span class="emoji">➕</span><span class="label">Add</span></button>
+    <button class="tabBtn" data-target="themes" aria-controls="themes" aria-expanded="false"><span class="emoji">🍩</span><span class="label">Themes</span></button>
+    <button class="tabBtn" data-target="library" aria-controls="library" aria-expanded="false"><span class="emoji">📁</span><span class="label">My Cards</span></button>
+    <button class="tabBtn" data-target="coreWords" aria-controls="coreWords" aria-expanded="false"><span class="emoji">💬</span><span class="label">Core Words</span></button>
+    <button class="tabBtn" data-target="sentence" aria-controls="sentence" aria-expanded="false"><span class="emoji">🧱</span><span class="label">Build</span></button>
+  </div>
+</nav>
+
 
   <!-- === PANELS === -->
   <section id="add-card" class="panel">
