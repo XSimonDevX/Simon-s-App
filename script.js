@@ -733,6 +733,65 @@ if (voiceSelect) {
   });
 }
 
+// === Panel Show/Hide Logic ===
+const panels = Array.from(document.querySelectorAll("section.panel"));
+const tabButtons = Array.from(document.querySelectorAll("#topBar .tabBtn"));
+
+function showPanel(id) {
+  panels.forEach(sec => sec.classList.remove("active"));
+  tabButtons.forEach(btn => btn.classList.remove("active"));
+
+  const panel = document.getElementById(id);
+  const btn = tabButtons.find(b => b.dataset.target === id);
+
+  if (panel) panel.classList.add("active");
+  if (btn) {
+    btn.classList.add("active");
+    btn.setAttribute("aria-expanded", "true");
+  }
+  tabButtons.filter(b => b !== btn).forEach(b => b.setAttribute("aria-expanded", "false"));
+
+  try { localStorage.setItem("lastPanel", id); } catch {}
+}
+
+function closePanel(id) {
+  const panel = document.getElementById(id);
+  const btn = tabButtons.find(b => b.dataset.target === id);
+  if (panel) panel.classList.remove("active");
+  if (btn) {
+    btn.classList.remove("active");
+    btn.setAttribute("aria-expanded", "false");
+  }
+}
+
+tabButtons.forEach(btn => {
+  btn.addEventListener("click", () => {
+    const id = btn.dataset.target;
+    const panel = document.getElementById(id);
+    const open = panel.classList.contains("active");
+    open ? closePanel(id) : showPanel(id);
+  });
+});
+
+document.addEventListener("click", e => {
+  const close = e.target.closest(".panelClose");
+  if (!close) return;
+  closePanel(close.dataset.close);
+});
+
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape") {
+    const open = panels.find(p => p.classList.contains("active"));
+    if (open) closePanel(open.id);
+  }
+});
+
+// Open the last panel (or Core Words) on load
+window.addEventListener("load", () => {
+  const saved = localStorage.getItem("lastPanel") || "coreWords";
+  showPanel(saved);
+});
+
 
 // ===== INIT =====
 (async function init() {
