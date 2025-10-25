@@ -722,6 +722,8 @@ const coreWords = [
   // personal/favourite
   { text: "Noddy", type: "personal" }
 ];
+window.coreWords = coreWords; // expose to the sentence builder
+
 function displayCoreWords() {
   coreContainer.innerHTML = "";
   coreWords.forEach(word => {
