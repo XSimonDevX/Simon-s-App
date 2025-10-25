@@ -390,15 +390,6 @@ section.panel.active {
 
 section h2 { display: inline-block; }
 
-/* --- Tile-style top buttons (flashcard look) --- */
-#topBar {
-  position: sticky;
-  top: 0;
-  z-index: 10000;
-  background: #fff;
-  padding: 12px 10px 14px;
-  border-bottom: 1px solid #eaeaea;
-
   /* grid of big squares */
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
@@ -476,6 +467,7 @@ body {
 :root {
   --topbar-h: 130px; /* approximate bar height; JS will refine it */
 }
+
 
 #topBar {
   position: fixed;
