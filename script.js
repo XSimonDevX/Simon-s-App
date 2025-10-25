@@ -599,7 +599,32 @@ const themeSets = {
     { text: "swimming",   icon: "🏊" },
     { text: "cycling",    icon: "🚴" },
     { text: "skating",    icon: "⛸️" },
-    { text: "skiing",     icon: "🎿" }
+    { text: "skiing",     icon: "🎿" } 
+  ],
+
+   // NEW: Days of the Week
+  days: [
+    { text: "Monday", icon: "🌞" },
+    { text: "Tuesday", icon: "🌤️" },
+    { text: "Wednesday", icon: "☀️" },
+    { text: "Thursday", icon: "🌈" },
+    { text: "Friday", icon: "😎" },
+    { text: "Saturday", icon: "🎉" },
+    { text: "Sunday", icon: "🛌" }
+  ],
+
+  // NEW: Numbers 1–10
+  numbers: [
+    { text: "one",   icon: "1️⃣" },
+    { text: "two",   icon: "2️⃣" },
+    { text: "three", icon: "3️⃣" },
+    { text: "four",  icon: "4️⃣" },
+    { text: "five",  icon: "5️⃣" },
+    { text: "six",   icon: "6️⃣" },
+    { text: "seven", icon: "7️⃣" },
+    { text: "eight", icon: "8️⃣" },
+    { text: "nine",  icon: "9️⃣" },
+    { text: "ten",   icon: "🔟" }
   ]
   
 };
@@ -634,6 +659,8 @@ function renderThemeButtons() {
     bodyparts: "🧍 Body Parts",
     activities: "🎯 Activities",
     sports: "🏅 Sports",
+    days: "📅 Days of the Week",
+    numbers: "🔢 Numbers",
 
   };
 
