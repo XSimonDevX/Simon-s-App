@@ -1142,19 +1142,18 @@ function renderThemeSetInPicker(set) {
 // 3) Wire up buttons
 if (togglePickerBtn) togglePickerBtn.addEventListener("click", () => openPicker("core"));
 if (closePickerBtn)  closePickerBtn.addEventListener("click", closePicker);
+
 document.querySelectorAll(".pickTab").forEach(btn => {
   btn.addEventListener("click", () => {
     const tab = btn.dataset.tab;
     setActivePickerTab(tab);
     renderPickerTab(tab);
   });
-});
+}); // <- closes forEach, nothing else after this brace
 
 // 4) Initialize Quick Words on load
 window.addEventListener("load", renderQuickWords);
 
-// 4) Initialize Quick Words on load
-window.addEventListener("load", renderQuickWords);
 // ===== INIT =====
 (async function init() {
   await displayCards();
