@@ -268,30 +268,6 @@ async function deleteCardFromDB(card) {
   });
 }
 
-
-// --- Main displayCards() ---
-// helper stays as-is
-async function deleteCardFromDB(card) {
-  const db = await openDB();
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(STORE, "readwrite");
-    const store = tx.objectStore(STORE);
-    if (card.id != null) {
-      store.delete(card.id);
-    } else {
-      const idx = store.index("text");
-      const req = idx.openCursor(card.text);
-      req.onsuccess = (ev) => {
-        const cursor = ev.target.result;
-        if (cursor) cursor.delete();
-      };
-      req.onerror = () => reject(req.error);
-    }
-    tx.oncomplete = () => resolve();
-    tx.onerror = () => reject(tx.error);
-  });
-}
-
 async function displayCards() {
   const cards = await getAllCardsFromDB();
   cardContainer.innerHTML = "";
@@ -665,6 +641,30 @@ const coreWords = [
   // personal/favourite
   { text: "Noddy", type: "personal" }
 ];
+function displayCoreWords() {
+  coreContainer.innerHTML = "";
+  coreWords.forEach(word => {
+    const div = document.createElement("div");
+    div.className = "core-card";
+    div.textContent = word.text;
+
+    // color by type
+    const bg = typeColor[word.type] || "#ffe6e6";
+    div.style.background = bg;
+    div.dataset.type = word.type || "";
+
+    // interactivity
+    div.draggable = true;
+    div.addEventListener("click", () =>
+      speechSynthesis.speak(new SpeechSynthesisUtterance(word.text))
+    );
+    div.addEventListener("dragstart", (e) =>
+      e.dataTransfer.setData("text/plain", JSON.stringify({ text: word.text }))
+    );
+
+    coreContainer.appendChild(div);
+  });
+}
 
 // === AUTO-SHRINK LABELS TO FIT ONE LINE ===
 function shrinkToFit(p) {
