@@ -444,3 +444,13 @@ section h2 { display: inline-block; }
   #topBar .tabBtn .label { font-size: 15px; }
 }
 
+/* === Remove unwanted top space === */
+body {
+  padding-top: 0 !important;   /* remove old spacing from sticky nav */
+  margin-top: 0;
+}
+
+h1, h2, h3 {
+  margin-top: 0;
+}
+
