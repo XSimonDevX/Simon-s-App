@@ -1112,7 +1112,7 @@ function renderThemeSetInPicker(set) {
       img.className = "picker-thumb";
       img.alt = card.text || "";
       img.src = card.image;
-      img.onerror = () => { img.style.display = "none"; }
+      img.onerror = () => { img.style.display = "none"; 
       div.appendChild(img);
     }
 
