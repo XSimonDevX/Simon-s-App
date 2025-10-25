@@ -631,6 +631,10 @@ function renderThemeButtons() {
     vehicles: "🚗 Vehicles",
     feelings: "😊 Feelings",
     animals: "🐾 Animals",
+    bodyparts: "🧍 Body Parts",
+    activities: "🎯 Activities",
+    sports: "🏅 Sports",
+
   };
 
   host.innerHTML = "";
