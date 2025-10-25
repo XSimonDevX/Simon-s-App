@@ -1091,50 +1091,22 @@ if (tab === "cards") {
 }
 
 
-// ✅ THEMES: emoji + optional image + label
-function renderThemeSetInPicker(set) {
-  pickerGrid.innerHTML = "";
-  (set || []).forEach(card => {
-    const div = document.createElement("div");
-    div.className = "picker-item";
-
-    // Emoji (if provided)
-    if (card.icon) {
-      const emoji = document.createElement("div");
-      emoji.className = "picker-emoji";
-      emoji.textContent = card.icon;
-      div.appendChild(emoji);
-    }
-
-    // Optional image (hide if broken)
-    if (card.image) {
-      const img = document.createElement("img");
-      img.className = "picker-thumb";
-      img.alt = card.text || "";
-      img.src = card.image;
-      img.onerror = () => { img.style.display = "none"; 
-      div.appendChild(img);
-    }
-
     // Label
     const p = document.createElement("p");
     p.textContent = card.text || "";
     div.appendChild(p);
-
     // Interactions
     div.draggable = true;
     div.addEventListener("click", () => addToSentence(card));
     div.addEventListener("dragstart", e => {
       e.dataTransfer.setData("text/plain", JSON.stringify(card));
     });
-
     pickerGrid.appendChild(div);
   });
 }
-
 // 3) Wire up buttons
 if (togglePickerBtn) togglePickerBtn.addEventListener("click", () => openPicker("core"));
-if (closePickerBtn)  closePickerBtn.addEventListener("click", closePicker);
+if (closePickerBtn) closePickerBtn.addEventListener("click", closePicker);
 document.querySelectorAll(".pickTab").forEach(btn => {
   btn.addEventListener("click", () => {
     const tab = btn.dataset.tab;
@@ -1142,11 +1114,8 @@ document.querySelectorAll(".pickTab").forEach(btn => {
     renderPickerTab(tab);
   });
 });
-
 // 4) Initialize Quick Words on load
 window.addEventListener("load", renderQuickWords);
-
-
 // ===== INIT =====
 (async function init() {
   await displayCards();
