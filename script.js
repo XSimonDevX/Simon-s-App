@@ -615,7 +615,8 @@ function showTheme(set) {
 const coreContainer = document.getElementById("coreContainer");
 const coreWords = [
   { text: "I" }, { text: "want" }, { text: "help" },{ text: "Toilet" },{ text: "Noddy" },
-  { text: "yes" }, { text: "no" }, { text: "you" }, { text: "me" }
+  { text: "yes" }, { text: "no" }, { text: "you" }, { text: "me" }, 
+  { text: "yesterday" }, { text: "tomorrow" }, { text: "sorry" }, { text: "thank you" }
 ];
 const colorMap = {
   I: "#b3d9ff", you: "#b3d9ff", me: "#b3d9ff",
