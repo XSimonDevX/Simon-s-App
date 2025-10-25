@@ -1019,11 +1019,41 @@ function renderThemeSetInPicker(set) {
   set.forEach(card => {
     const div = document.createElement("div");
     div.className = "picker-item";
-    const hasImg = !!card.image;
-    div.innerHTML = `
-      ${hasImg ? `<img src="${card.image}" alt="${card.text||""}">` : ""}
-      <p>${card.text || ""}</p>`;
+
+    // Always show emoji if provided
+    if (card.icon) {
+      const emoji = document.createElement("div");
+      emoji.className = "picker-emoji";
+      emoji.textContent = card.icon;
+      div.appendChild(emoji);
+    }
+
+    // Optional image (hide if missing/broken)
+    if (card.image) {
+      const img = document.createElement("img");
+      img.className = "picker-thumb";
+      img.alt = card.text || "";
+      img.src = card.image;
+      img.onerror = () => { img.style.display = "none"; };
+      div.appendChild(img);
+    }
+
+    // Label
+    const p = document.createElement("p");
+    p.textContent = card.text || "";
+    div.appendChild(p);
+
+    // Interactions
     div.draggable = true;
+    div.addEventListener("click", () => addToSentence(card));
+    div.addEventListener("dragstart", e => {
+      e.dataTransfer.setData("text/plain", JSON.stringify(card));
+    });
+
+    pickerGrid.appendChild(div);
+  });
+}
+
 
     // click/tap adds to sentence
     div.addEventListener("click", () => addToSentence(card));
