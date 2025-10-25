@@ -749,8 +749,11 @@ function showPanel(id) {
     btn.classList.add("active");
     btn.setAttribute("aria-expanded", "true");
   }
+
+  // Close others for accessibility
   tabButtons.filter(b => b !== btn).forEach(b => b.setAttribute("aria-expanded", "false"));
 
+  // Save last open panel
   try { localStorage.setItem("lastPanel", id); } catch {}
 }
 
@@ -764,6 +767,7 @@ function closePanel(id) {
   }
 }
 
+// Toggle panel visibility on click
 tabButtons.forEach(btn => {
   btn.addEventListener("click", () => {
     const id = btn.dataset.target;
@@ -773,12 +777,14 @@ tabButtons.forEach(btn => {
   });
 });
 
+// Allow closing with the ✖ button
 document.addEventListener("click", e => {
   const close = e.target.closest(".panelClose");
   if (!close) return;
   closePanel(close.dataset.close);
 });
 
+// Allow closing with Escape key
 document.addEventListener("keydown", e => {
   if (e.key === "Escape") {
     const open = panels.find(p => p.classList.contains("active"));
@@ -792,36 +798,19 @@ window.addEventListener("load", () => {
   showPanel(saved);
 });
 
-function updateTopbarHeightVar() {
-  const h = document.getElementById('topBar')?.offsetHeight || 120;
-  document.documentElement.style.setProperty('--topbar-h', h + 'px');
-}
-window.addEventListener('load', updateTopbarHeightVar);
-window.addEventListener('resize', () => setTimeout(updateTopbarHeightVar, 50));
+// ===== Fix: Dynamic body padding under fixed nav =====
+window.addEventListener("load", () => {
+  const bar = document.getElementById("topBar");
+  if (!bar) return;
+  // Add padding below nav height so content never hides underneath
+  document.body.style.paddingTop = bar.offsetHeight + 20 + "px";
+});
 
-// Dynamically adjust page padding based on nav height
-function updateTopbarHeightVar() {
-  const topbar = document.getElementById("topBar");
-  if (topbar) {
-    const h = topbar.offsetHeight;
-    document.documentElement.style.setProperty("--topbar-h", h + "px");
-  }
-}
-window.addEventListener("load", updateTopbarHeightVar);
-window.addEventListener("resize", () => setTimeout(updateTopbarHeightVar, 50));
-
-function setTopBarSpacer() {
-  const bar = document.getElementById('topBar');
-  const spacer = document.getElementById('topBarSpacer');
-  if (bar && spacer) {
-    const h = bar.offsetHeight;
-    document.documentElement.style.setProperty('--topbar-h', h + 'px');
-    spacer.style.height = h + 'px';
-  }
-}
-window.addEventListener('load', setTopBarSpacer);
-window.addEventListener('resize', () => setTimeout(setTopBarSpacer, 50));
-
+window.addEventListener("resize", () => {
+  const bar = document.getElementById("topBar");
+  if (!bar) return;
+  document.body.style.paddingTop = bar.offsetHeight + 20 + "px";
+});
 
 // ===== INIT =====
 (async function init() {
