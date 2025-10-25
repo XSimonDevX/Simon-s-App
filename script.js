@@ -1075,7 +1075,7 @@ document.querySelectorAll(".pickTab").forEach(btn => {
     setActivePickerTab(tab);
     renderPickerTab(tab);
   });
-});
+}
 
 // 4) Initialize ribbon on load
 window.addEventListener("load", renderQuickWords);
