@@ -359,3 +359,61 @@ button:disabled {
   padding-bottom: 120px; /* so it’s not hidden behind the dock */
   font-family: "Comic Sans MS", "Segoe UI", sans-serif;
 }
+/* === Top bar (tabs) === */
+#topBar {
+  position: sticky;
+  top: 0;
+  z-index: 10000;
+  background: #fff;
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+  padding: 8px 10px;
+  border-bottom: 1px solid #eaeaea;
+}
+
+#topBar .tabBtn {
+  background: #f3f5f8;
+  color: #333;
+  border: 1px solid #e2e6ec;
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-size: 15px;
+}
+
+#topBar .tabBtn.active {
+  background: #007bff;
+  border-color: #007bff;
+  color: #fff;
+}
+
+/* === Panels show/hide === */
+section.panel {
+  display: none;
+  transform-origin: top;
+  transition: opacity .15s ease, transform .15s ease;
+  opacity: 0;
+  transform: scaleY(.98);
+}
+
+section.panel.active {
+  display: block;
+  opacity: 1;
+  transform: scaleY(1);
+}
+
+/* Close button in section headers */
+.panelClose {
+  float: right;
+  margin-top: -4px;
+  margin-right: -4px;
+  background: #ff4d4d;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  padding: 6px 10px;
+}
+
+section h2 { display: inline-block; }
