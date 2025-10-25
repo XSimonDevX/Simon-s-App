@@ -799,6 +799,17 @@ function updateTopbarHeightVar() {
 window.addEventListener('load', updateTopbarHeightVar);
 window.addEventListener('resize', () => setTimeout(updateTopbarHeightVar, 50));
 
+// Dynamically adjust page padding based on nav height
+function updateTopbarHeightVar() {
+  const topbar = document.getElementById("topBar");
+  if (topbar) {
+    const h = topbar.offsetHeight;
+    document.documentElement.style.setProperty("--topbar-h", h + "px");
+  }
+}
+window.addEventListener("load", updateTopbarHeightVar);
+window.addEventListener("resize", () => setTimeout(updateTopbarHeightVar, 50));
+
 
 // ===== INIT =====
 (async function init() {
