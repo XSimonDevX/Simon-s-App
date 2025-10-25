@@ -812,6 +812,17 @@ window.addEventListener("resize", () => {
   document.body.style.paddingTop = bar.offsetHeight + 20 + "px";
 });
 
+
+// Make sure content starts below the fixed nav (no overlap)
+function fitBodyBelowNav(){
+  const bar = document.getElementById('topBar');
+  if (!bar) return;
+  document.body.style.paddingTop = (bar.offsetHeight + 12) + 'px';
+}
+window.addEventListener('load', fitBodyBelowNav);
+window.addEventListener('resize', () => setTimeout(fitBodyBelowNav, 50));
+
+
 // ===== INIT =====
 (async function init() {
   await displayCards();
