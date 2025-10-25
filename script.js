@@ -881,10 +881,31 @@ window.addEventListener("load", () => {
   showPanel(saved);
 });
 
+// === Auto-open the picker when Build panel is shown ===
+document.querySelectorAll("#topBar .tabBtn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    if (btn.dataset.target === "sentence") {
+      if (typeof renderQuickWords === "function") renderQuickWords();
+      if (typeof openPicker === "function") openPicker("core");
+    }
+  });
+});
+
+// If the app loads with the Build panel already active
+window.addEventListener("load", () => {
+  const last = localStorage.getItem("lastPanel");
+  if (last === "sentence") {
+    if (typeof renderQuickWords === "function") renderQuickWords();
+    if (typeof openPicker === "function") openPicker("core");
+  }
+});
+
+
 // ===== Fix: Dynamic body padding under fixed nav =====
 window.addEventListener("load", () => {
   const bar = document.getElementById("topBar");
   if (!bar) return;
+  
   // Add padding below nav height so content never hides underneath
   document.body.style.paddingTop = bar.offsetHeight + 20 + "px";
 });
@@ -917,6 +938,7 @@ window.addEventListener('resize', () => setTimeout(fitBodyBelowNav, 50));
   }
 
   if (cw && typeof cw === "object") {
+    
     // convert object/dictionary into array
     const arr = Object.values(cw).map(v => {
       if (typeof v === "string") return { text: v };
@@ -1000,6 +1022,7 @@ async function renderPickerTab(tab) {
   if (themeBtnsHost) themeBtnsHost.innerHTML = "";
 
   if (tab === "core") {
+    
   // safely handle any format of coreWords
   const list = Array.isArray(window.coreWords)
     ? window.coreWords
@@ -1024,6 +1047,7 @@ async function renderPickerTab(tab) {
 
 
   if (tab === "themes") {
+    
     // build mini theme buttons then show default (food)
     const labels = {
       food:"🍎 Food", clothes:"👕 Clothes", places:"🏠 Places",
@@ -1044,6 +1068,7 @@ async function renderPickerTab(tab) {
   }
 
   if (tab === "cards") {
+    
     // load custom cards from IndexedDB
     const cards = await getAllCardsFromDB();
     cards.forEach(card => {
