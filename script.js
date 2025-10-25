@@ -1016,97 +1016,132 @@ function setActivePickerTab(tab) {
   });
 }
 
+// --- Make sure themes are available on window for the picker ---
+if (typeof window.themeSets === "undefined" && typeof themeSets !== "undefined") {
+  window.themeSets = themeSets;
+}
+
 async function renderPickerTab(tab) {
   if (!pickerGrid) return;
   pickerGrid.innerHTML = "";
   if (themeBtnsHost) themeBtnsHost.innerHTML = "";
 
+  // CORE
   if (tab === "core") {
-    
-  // safely handle any format of coreWords
-  const list = Array.isArray(window.coreWords)
-    ? window.coreWords
-    : (typeof window.coreWords === "object"
-        ? Object.values(window.coreWords)
-        : []);
+    const list = Array.isArray(window.coreWords)
+      ? window.coreWords
+      : (typeof window.coreWords === "object" ? Object.values(window.coreWords) : []);
 
-  list.forEach(w => {
-    const text = typeof w === "string" ? w : w.text;
-    const div = document.createElement("div");
-    div.className = "picker-item";
-    div.innerHTML = `<p>${text}</p>`;
-    div.draggable = true;
-    div.addEventListener("click", () => addToSentence({ text }));
-    div.addEventListener("dragstart", e => {
-      e.dataTransfer.setData("text/plain", JSON.stringify({ text }));
+    list.forEach(w => {
+      const text = (typeof w === "string") ? w : w.text;
+      if (!text) return;
+      const div = document.createElement("div");
+      div.className = "picker-item";
+      div.innerHTML = `<p>${text}</p>`;
+      div.draggable = true;
+      div.addEventListener("click", () => addToSentence({ text }));
+      div.addEventListener("dragstart", e => {
+        e.dataTransfer.setData("text/plain", JSON.stringify({ text }));
+      });
+      pickerGrid.appendChild(div);
     });
-    pickerGrid.appendChild(div);
-  });
-  return;
-}
+    return;
+  }
 
-
+  // THEMES
   if (tab === "themes") {
-  // build mini theme buttons then show default (food)
-  const labels = {
-    food:"🍎 Food", clothes:"👕 Clothes", places:"🏠 Places",
-    people:"🧍 People", colours:"🎨 Colours", vehicles:"🚗 Vehicles",
-    feelings:"😊 Feelings", animals:"🐾 Animals"
-  };
+    const sets = window.themeSets || {};
+    const labels = {
+      food:"🍎 Food", clothes:"👕 Clothes", places:"🏠 Places",
+      people:"🧍 People", colours:"🎨 Colours", vehicles:"🚗 Vehicles",
+      feelings:"😊 Feelings", animals:"🐾 Animals"
+    };
 
-  if (themeBtnsHost) themeBtnsHost.innerHTML = "";
+    if (themeBtnsHost) {
+      Object.keys(sets).forEach(key => {
+        const b = document.createElement("button");
+        b.className = "miniThemeBtn";
+        b.textContent = labels[key] || key;
+        b.addEventListener("click", () => renderThemeSetInPicker(sets[key]));
+        themeBtnsHost.appendChild(b);
+      });
+    }
 
-  Object.keys(themeSets).forEach(key => {
-    const b = document.createElement("button");
-    b.className = "miniThemeBtn";
-    b.textContent = labels[key] || key;
-    b.addEventListener("click", () => renderThemeSetInPicker(themeSets[key]));
-    themeBtnsHost.appendChild(b);
-  });
+    if (sets.food) {
+      renderThemeSetInPicker(sets.food);
+    } else {
+      pickerGrid.innerHTML = "<p style='padding:8px'>No theme sets found.</p>";
+    }
+    return;
+  }
 
-  renderThemeSetInPicker(themeSets.food);
-  return;
+  // MY CARDS (IndexedDB)
+  if (tab === "cards") {
+    const cards = await getAllCardsFromDB();
+    cards.forEach(card => {
+      const div = document.createElement("div");
+      div.className = "picker-item";
+      const hasImg = !!card.imageBlob;
+      div.innerHTML = `
+        ${hasImg ? `<img class="picker-thumb" src="${URL.createObjectURL(card.imageBlob)}" alt="${card.text}">` : ""}
+        <p>${card.text}</p>`;
+      div.draggable = true;
+
+      div.addEventListener("click", () => addToSentence(card));
+      div.addEventListener("dragstart", e => {
+        e.dataTransfer.setData("text/plain", JSON.stringify({ text: card.text }));
+      });
+
+      pickerGrid.appendChild(div);
+    });
+    return;
+  }
 }
 
-if (tab === "cards") {
-  // load custom cards from IndexedDB
-  const cards = await getAllCardsFromDB();
-  cards.forEach(card => {
+// ✅ THEMES: emoji + optional image + label
+function renderThemeSetInPicker(set) {
+  pickerGrid.innerHTML = "";
+  (set || []).forEach(card => {
     const div = document.createElement("div");
     div.className = "picker-item";
-    const hasImg = !!card.imageBlob;
-    div.innerHTML = `
-      ${hasImg ? `<img class="picker-thumb" src="${URL.createObjectURL(card.imageBlob)}" alt="${card.text}">` : ""}
-      <p>${card.text}</p>`;
-    div.draggable = true;
 
-    div.addEventListener("click", () => addToSentence(card));
-    div.addEventListener("dragstart", e => {
-      e.dataTransfer.setData("text/plain", JSON.stringify({ text: card.text }));
-    });
+    // Emoji (if provided)
+    if (card.icon) {
+      const emoji = document.createElement("div");
+      emoji.className = "picker-emoji";
+      emoji.textContent = card.icon;
+      div.appendChild(emoji);
+    }
 
-    pickerGrid.appendChild(div);
-  });
-  return;
-}
-
+    // Optional image (hide if broken)
+    if (card.image) {
+      const img = document.createElement("img");
+      img.className = "picker-thumb";
+      img.alt = card.text || "";
+      img.src = card.image;
+      img.onerror = () => { img.style.display = "none"; };
+      div.appendChild(img);
+    }
 
     // Label
     const p = document.createElement("p");
     p.textContent = card.text || "";
     div.appendChild(p);
+
     // Interactions
     div.draggable = true;
     div.addEventListener("click", () => addToSentence(card));
     div.addEventListener("dragstart", e => {
       e.dataTransfer.setData("text/plain", JSON.stringify(card));
     });
+
     pickerGrid.appendChild(div);
   });
 }
+
 // 3) Wire up buttons
 if (togglePickerBtn) togglePickerBtn.addEventListener("click", () => openPicker("core"));
-if (closePickerBtn) closePickerBtn.addEventListener("click", closePicker);
+if (closePickerBtn)  closePickerBtn.addEventListener("click", closePicker);
 document.querySelectorAll(".pickTab").forEach(btn => {
   btn.addEventListener("click", () => {
     const tab = btn.dataset.tab;
@@ -1114,6 +1149,10 @@ document.querySelectorAll(".pickTab").forEach(btn => {
     renderPickerTab(tab);
   });
 });
+
+// 4) Initialize Quick Words on load
+window.addEventListener("load", renderQuickWords);
+
 // 4) Initialize Quick Words on load
 window.addEventListener("load", renderQuickWords);
 // ===== INIT =====
