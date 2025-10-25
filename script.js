@@ -810,6 +810,18 @@ function updateTopbarHeightVar() {
 window.addEventListener("load", updateTopbarHeightVar);
 window.addEventListener("resize", () => setTimeout(updateTopbarHeightVar, 50));
 
+function setTopBarSpacer() {
+  const bar = document.getElementById('topBar');
+  const spacer = document.getElementById('topBarSpacer');
+  if (bar && spacer) {
+    const h = bar.offsetHeight;
+    document.documentElement.style.setProperty('--topbar-h', h + 'px');
+    spacer.style.height = h + 'px';
+  }
+}
+window.addEventListener('load', setTopBarSpacer);
+window.addEventListener('resize', () => setTimeout(setTopBarSpacer, 50));
+
 
 // ===== INIT =====
 (async function init() {
