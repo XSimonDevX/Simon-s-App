@@ -463,31 +463,52 @@ body {
 /* Optional: a subtle shadow so the bar feels layered */
 #topBar { box-shadow: 0 2px 10px rgba(0,0,0,.06); }
 
-/* === Fixed top bar (tile buttons) === */
-:root {
-  --topbar-h: 130px; /* approximate bar height; JS will refine it */
-}
-
-
-#topBar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
+/* === Fixed nav + big square tiles (override) === */
+#topBar{
+  position: fixed;             /* not sticky */
+  top: 0; left: 0; right: 0;
   z-index: 10000;
   background: #fff;
-  padding: 12px 10px 14px;
   border-bottom: 1px solid #eaeaea;
-  box-shadow: 0 2px 10px rgba(0,0,0,.06);
-
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
-  gap: 12px;
-  max-width: 560px;
-  margin: 0 auto;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
 }
 
-/* Push page content below the fixed nav */
-body {
-  padding-top: calc(var(--topbar-h) + 12px);
+/* grid wrapper inside the bar */
+#topBar .topBar-inner{
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 12px 10px 14px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+}
+
+/* BIG SQUARE buttons */
+#topBar .tabBtn{
+  display: grid;
+  place-items: center;
+  border: 1px solid #e2e6ec;
+  border-radius: 16px;
+  background: #f5f6fa;
+  color: #222;
+  font-weight: 700;
+  box-shadow: 0 2px 6px rgba(0,0,0,.06);
+  transition: transform .12s ease;
+
+  aspect-ratio: 1 / 1;  /* <-- keeps them square */
+  min-height: 110px;
+}
+
+#topBar .tabBtn:active{ transform: scale(.98); }
+#topBar .tabBtn.active{ box-shadow: 0 6px 16px rgba(0,0,0,.12); }
+
+/* optional emoji/label sizing */
+#topBar .tabBtn .emoji{ font-size: 34px; line-height: 1; }
+#topBar .tabBtn .label{ font-size: 16px; margin-top: 6px; }
+
+/* safe default so nothing overlaps before JS runs */
+body { padding-top: 180px; }
+
+@media (max-width:420px){
+  #topBar .topBar-inner{ grid-template-columns: repeat(2, 1fr); }
 }
