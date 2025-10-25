@@ -1047,49 +1047,49 @@ async function renderPickerTab(tab) {
 
 
   if (tab === "themes") {
-    
-    // build mini theme buttons then show default (food)
-    const labels = {
-      food:"🍎 Food", clothes:"👕 Clothes", places:"🏠 Places",
-      people:"🧍 People", colours:"🎨 Colours", vehicles:"🚗 Vehicles",
-      feelings:"😊 Feelings", animals:"🐾 Animals"
-    };
+  // build mini theme buttons then show default (food)
+  const labels = {
+    food:"🍎 Food", clothes:"👕 Clothes", places:"🏠 Places",
+    people:"🧍 People", colours:"🎨 Colours", vehicles:"🚗 Vehicles",
+    feelings:"😊 Feelings", animals:"🐾 Animals"
+  };
 
-    Object.keys(window.themeSets || {}).forEach(key => {
-      const b = document.createElement("button");
-      b.className = "miniThemeBtn";
-      b.textContent = labels[key] || key;
-      b.addEventListener("click", ()=> renderThemeSetInPicker(themeSets[key]));
-      themeBtnsHost.appendChild(b);
-    });
+  if (themeBtnsHost) themeBtnsHost.innerHTML = "";
 
-    if (window.themeSets && themeSets.food) renderThemeSetInPicker(themeSets.food);
-    return;
-  }
+  Object.keys(themeSets).forEach(key => {
+    const b = document.createElement("button");
+    b.className = "miniThemeBtn";
+    b.textContent = labels[key] || key;
+    b.addEventListener("click", () => renderThemeSetInPicker(themeSets[key]));
+    themeBtnsHost.appendChild(b);
+  });
 
-  if (tab === "cards") {
-    
-    // load custom cards from IndexedDB
-    const cards = await getAllCardsFromDB();
-    cards.forEach(card => {
-      const div = document.createElement("div");
-      div.className = "picker-item";
-      const hasImg = !!card.imageBlob;
-      div.innerHTML = `
-        ${hasImg ? `<img class="picker-thumb" src="${URL.createObjectURL(card.imageBlob)}" alt="${card.text}">` : ""}
-        <p>${card.text}</p>`;
-      div.draggable = true;
-
-      div.addEventListener("click", () => addToSentence(card));
-      div.addEventListener("dragstart", e => {
-        e.dataTransfer.setData("text/plain", JSON.stringify({ text: card.text }));
-      });
-
-      pickerGrid.appendChild(div);
-    });
-    return;
-  }
+  renderThemeSetInPicker(themeSets.food);
+  return;
 }
+
+if (tab === "cards") {
+  // load custom cards from IndexedDB
+  const cards = await getAllCardsFromDB();
+  cards.forEach(card => {
+    const div = document.createElement("div");
+    div.className = "picker-item";
+    const hasImg = !!card.imageBlob;
+    div.innerHTML = `
+      ${hasImg ? `<img class="picker-thumb" src="${URL.createObjectURL(card.imageBlob)}" alt="${card.text}">` : ""}
+      <p>${card.text}</p>`;
+    div.draggable = true;
+
+    div.addEventListener("click", () => addToSentence(card));
+    div.addEventListener("dragstart", e => {
+      e.dataTransfer.setData("text/plain", JSON.stringify({ text: card.text }));
+    });
+
+    pickerGrid.appendChild(div);
+  });
+  return;
+}
+
 
 // ✅ THEMES: emoji + optional image + label
 function renderThemeSetInPicker(set) {
