@@ -998,20 +998,28 @@ async function renderPickerTab(tab) {
   if (themeBtnsHost) themeBtnsHost.innerHTML = "";
 
   if (tab === "core") {
-    // render all core words as small tiles
-    (window.coreWords || []).forEach(w => {
-      const div = document.createElement("div");
-      div.className = "picker-item";
-      div.innerHTML = `<p>${w.text}</p>`;
-      div.draggable = true;
-      div.addEventListener("click", () => addToSentence({ text: w.text }));
-      div.addEventListener("dragstart", e => {
-        e.dataTransfer.setData("text/plain", JSON.stringify({ text: w.text }));
-      });
-      pickerGrid.appendChild(div);
+  // safely handle any format of coreWords
+  const list = Array.isArray(window.coreWords)
+    ? window.coreWords
+    : (typeof window.coreWords === "object"
+        ? Object.values(window.coreWords)
+        : []);
+
+  list.forEach(w => {
+    const text = typeof w === "string" ? w : w.text;
+    const div = document.createElement("div");
+    div.className = "picker-item";
+    div.innerHTML = `<p>${text}</p>`;
+    div.draggable = true;
+    div.addEventListener("click", () => addToSentence({ text }));
+    div.addEventListener("dragstart", e => {
+      e.dataTransfer.setData("text/plain", JSON.stringify({ text }));
     });
-    return;
-  }
+    pickerGrid.appendChild(div);
+  });
+  return;
+}
+
 
   if (tab === "themes") {
     // build mini theme buttons then show default (food)
