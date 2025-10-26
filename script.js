@@ -682,7 +682,6 @@ const themeSets = {
     { text: "play",  icon: "🧸" },
     { text: "sing",  icon: "🎤" },
     { text: "dance", icon: "💃" },
-    { text: "jump",  icon: "🤸" },
     { text: "swim",  icon: "🏊" },
     { text: "watch", icon: "📺" },
     { text: "run", icon: "🏃‍♂️" },
