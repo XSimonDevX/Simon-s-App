@@ -484,12 +484,12 @@ clearBtn.addEventListener("click", () => {
 // ===== Themes with centered emoji =====
 const themeSets = {
   food: [
-    { image: "./img/ice-cream.png", text: "ice-cream", icon: "🍦" },
-    { image: "./img/apple.png", text: "apple", icon: "🍎" },
-    { image: "./img/orange.png", text: "orange", icon: "🍊" },
-    { image: "./img/banana.png", text: "banana", icon: "🍌" },
-    { image: "./img/strawberry.png", text: "strawberry", icon: "🍓" },
-    { image: "./img/cookies.png", text: "cookies", icon: "🍪" },
+    { text: "ice-cream", icon: "🍦" },
+    { text: "apple", icon: "🍎" },
+    { text: "orange", icon: "🍊" },
+    { text: "banana", icon: "🍌" },
+    { text: "strawberry", icon: "🍓" },
+    { text: "cookies", icon: "🍪" },
     { text: "bread", icon: "🍞" },
     { text: "sandwich", icon: "🥪" },
     { text: "pizza", icon: "🍕" },
@@ -736,7 +736,7 @@ const themeSets = {
     { text: "Sunday",    icon: "🛌", }
   ],
 
-  // NEW: Numbers 1–10
+  
   numbers: [
     { text: "one",   icon: "1️⃣" },
     { text: "two",   icon: "2️⃣" },
@@ -748,7 +748,21 @@ const themeSets = {
     { text: "eight", icon: "8️⃣" },
     { text: "nine",  icon: "9️⃣" },
     { text: "ten",   icon: "🔟" }
-  ]
+  ],
+
+  months: [
+    { text: "January", icon: "❄️" },
+    { text: "February", icon: "💘" },
+    { text: "March", icon: "🌸" },
+    { text: "April", icon: "🌧️" },
+    { text: "May", icon: "🌼" },
+    { text: "June", icon: "☀️" },
+    { text: "July", icon: "🎆" },
+    { text: "August", icon: "🏖️" },
+    { text: "September", icon: "🍂" },
+    { text: "October", icon: "🎃" },
+    { text: "November", icon: "🦃" },
+    { text: "December", icon: "🎄" }
   
 };
 
@@ -784,6 +798,7 @@ function renderThemeButtons() {
     sports: "🏅 Sports",
     days: "📅 Days of the Week",
     numbers: "🔢 Numbers",
+    months:"📅 Months",
 
   };
 
