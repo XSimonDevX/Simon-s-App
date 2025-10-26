@@ -608,7 +608,18 @@ const themeSets = {
     { text: "tired",   icon: "🥱" },
     { text: "sick",    icon: "🤒" },
     { text: "proud",   icon: "😌" },
-    { text: "hurt",    icon: "🤕" }
+    { text: "hurt",    icon: "🤕" },
+    { text: "bored", icon: "😐" },
+    { text: "worried", icon: "😟" },
+    { text: "surprised", icon: "😲" },
+    { text: "shy", icon: "🤭" },
+    { text: "confused", icon: "😕" },
+    { text: "calm", icon: "😌" },
+    { text: "nervous", icon: "😬" },
+    { text: "silly", icon: "🤪" },
+    { text: "sleepy", icon: "😴" },
+    { text: "loved", icon: "🥰" },
+    { text: "okay", icon: "🙂" }
   ],
   animals: [
     { text: "dog",      icon: "🐕" },
