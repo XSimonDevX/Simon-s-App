@@ -533,7 +533,6 @@ const themeSets = {
     { text: "zoo", icon: "🦓" },
     { text: "cinema", icon: "🎬" },
     { text: "restaurant", icon: "🍽️" },
-    { text: "supermarket", icon: "🛍️" },
     { text: "hospital", icon: "🏥" },
     { text: "doctor", icon: "🩺" },
     { text: "dentist", icon: "🦷" },
