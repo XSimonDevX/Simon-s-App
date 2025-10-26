@@ -795,7 +795,8 @@ const coreWords = [
 
   // places & needs
   { text: "home", type: "place" }, { text: "school", type: "place" },
-  { text: "toilet", type: "need" },
+  { text: "toilet", type: "need" }, { text: "beach", type: "place" },
+  { text: "cinema", type: "place" }, { text: "shop", type: "place" },
 
   // personal/favourite
   { text: "Noddy", type: "personal" }, { text: "peppa pig", type: "personal" }
