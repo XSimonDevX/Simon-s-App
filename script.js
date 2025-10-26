@@ -798,7 +798,7 @@ const coreWords = [
   { text: "toilet", type: "need" },
 
   // personal/favourite
-  { text: "Noddy", type: "personal" }
+  { text: "Noddy", type: "personal" }, { text: "peppa pig", type: "personal" }
 ];
 window.coreWords = coreWords; // expose to the sentence builder
 
