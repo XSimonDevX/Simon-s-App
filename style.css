@@ -288,3 +288,36 @@ section.panel.active{ display:block; opacity:1; transform:none; }
   *{ transition:none !important; animation:none !important; }
 }
 
+/* === Improved layout: 2×3 grid for 5 top tiles === */
+#topBar .topBar-inner {
+  max-width: 720px;                 /* keeps layout nicely centered */
+  margin: 20px auto;
+  padding: 0 10px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);  /* 2 tiles per row */
+  grid-auto-rows: 1fr;
+  gap: 20px;
+  justify-items: center;
+}
+
+/* Make each tile look balanced */
+#topBar .tabBtn {
+  width: 100%;
+  max-width: 300px;
+  aspect-ratio: 4 / 3;
+  min-height: 140px;
+}
+
+/* Center the last single tile ("Build") if it’s alone on the last row */
+#topBar .topBar-inner .tabBtn:last-child:nth-child(odd) {
+  grid-column: 1 / span 2;
+  justify-self: center;
+}
+
+/* For very narrow screens, collapse to 1 per row */
+@media (max-width: 480px) {
+  #topBar .topBar-inner {
+    grid-template-columns: 1fr;
+    max-width: 400px;
+  }
+}
