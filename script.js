@@ -588,7 +588,16 @@ const themeSets = {
     { text: "airplane", icon: "✈️" },
     { text: "boat",     icon: "🛥️" },
     { text: "truck",    icon: "🚚" },
-    { text: "scooter",  icon: "🛵" }
+    { text: "scooter",  icon: "🛵" },
+    { text: "ambulance", icon: "🚑" },
+    { text: "fire truck", icon: "🚒" },
+    { text: "police car", icon: "🚓" },
+    { text: "tractor", icon: "🚜" },
+    { text: "helicopter", icon: "🚁" },
+    { text: "taxi", icon: "🚕" },
+    { text: "train engine", icon: "🚂" },
+    { text: "rocket", icon: "🚀" }
+    
   ],
   feelings: [
     { text: "happy",   icon: "😊" },
