@@ -1,73 +1,42 @@
-const CACHE_NAME = "flashcards-v69-idb";
+// Bump this any time you want clients to fetch a fresh bundle
+const CACHE_NAME = "flashcards-v72";
+
+// Build a base path from the SW scope (works on GitHub Pages subpath)
+const BASE = self.registration.scope.replace(/\/$/, "");
+
+// Precache core assets
 const ASSETS = [
-  "./",
-  "./index.html",
-  "./style.css",
-  "./script.js?v=69",
-  "./manifest.json",
-  "./icon-192.png",
-  "./icon-512.png",
-  "./img/apple.png",
-  "./img/orange.png",
-  "./img/banana.png",
-  "./img/strawberry.png",
-  "./img/ice-cream.png",
-  "./img/cookies.png",
-  "./img/tshirt.png",
-  "./img/pants.png",
-  "./img/shoes.png",
-  "./img/hat.png",
-  "./img/socks.png",
-  "./img/home.png",
-  "./img/school.png",
-  "./img/playground.png",
-  "./img/store.png",
-  "./img/boy.png",
-  "./img/girl.png",
-  "./img/mom.png",
-  "./img/dad.png",
-  "./img/grandma.png"
+  `${BASE}/`,
+  `${BASE}/index.html`,
+  `${BASE}/style.css?v=72`,
+  `${BASE}/script.js?v=72`,
+  `${BASE}/manifest.json?v=72`,
+  `${BASE}/icons/icon-192.png`,
+  `${BASE}/icons/icon-512.png`
+  // add theme images here if you want them pre-cached:
+  // `${BASE}/img/apple.png`, etc.
 ];
 
-// Install: pre-cache app shell
-self.addEventListener("install", event => {
+self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
   );
-  self.skipWaiting();
+  self.skipWaiting(); // activate immediately
 });
 
-// Activate: clear old caches
-self.addEventListener("activate", event => {
+self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(keys.map(k => (k !== CACHE_NAME ? caches.delete(k) : null)))
+    caches.keys().then((keys) =>
+      Promise.all(keys.map((k) => (k !== CACHE_NAME ? caches.delete(k) : null)))
     )
   );
-  self.clients.claim();
+  self.clients.claim(); // take control of open pages
 });
 
-// Fetch: stale-while-revalidate for same-origin files
-self.addEventListener("fetch", event => {
+// Cache-first for precached assets; network fallback for anything else
+self.addEventListener("fetch", (event) => {
   const { request } = event;
-  const url = new URL(request.url);
-
-  // skip non-GET requests or cross-origin
-  if (request.method !== "GET" || url.origin !== location.origin) return;
-
-  event.respondWith((async () => {
-    const cache = await caches.open(CACHE_NAME);
-    const cached = await cache.match(request);
-
-    const networkPromise = fetch(request).then(res => {
-      if (res && res.status === 200) cache.put(request, res.clone());
-      return res;
-    }).catch(() => cached); // offline fallback
-
-    return cached || networkPromise;
-  })());
-});
-
+  event.respondWith(
     caches.match(request).then((cached) => cached || fetch(request))
   );
 });
