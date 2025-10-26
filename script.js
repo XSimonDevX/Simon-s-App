@@ -689,7 +689,6 @@ const themeSets = {
     { text: "jump", icon: "🤸‍♂️" },
     { text: "walk", icon: "🚶‍♂️" },
     { text: "play", icon: "🎮" },
-    { text: "draw", icon: "✏️" },
     { text: "write", icon: "📝" },
     { text: "wash", icon: "🧼" },
     { text: "clean", icon: "🧹" },
