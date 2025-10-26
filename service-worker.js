@@ -3,7 +3,7 @@ const ASSETS = [
   "./",
   "./index.html",
   "./style.css",
-  "./script.js?v=66",
+  "./script.js?v=68",
   "./manifest.json",
   "./icon-192.png",
   "./icon-512.png",
