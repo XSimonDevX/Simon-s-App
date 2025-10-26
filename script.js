@@ -682,10 +682,25 @@ const themeSets = {
     { text: "play",  icon: "🧸" },
     { text: "sing",  icon: "🎤" },
     { text: "dance", icon: "💃" },
-    { text: "run",   icon: "🏃" },
     { text: "jump",  icon: "🤸" },
     { text: "swim",  icon: "🏊" },
-    { text: "watch", icon: "📺" }
+    { text: "watch", icon: "📺" },
+    { text: "run", icon: "🏃‍♂️" },
+    { text: "jump", icon: "🤸‍♂️" },
+    { text: "walk", icon: "🚶‍♂️" },
+    { text: "play", icon: "🎮" },
+    { text: "draw", icon: "✏️" },
+    { text: "write", icon: "📝" },
+    { text: "wash", icon: "🧼" },
+    { text: "clean", icon: "🧹" },
+    { text: "cook", icon: "👩‍🍳" },
+    { text: "build", icon: "🧱" },
+    { text: "drive", icon: "🚗" },
+    { text: "paint", icon: "🎨" },
+    { text: "hug", icon: "🤗" },
+    { text: "kiss", icon: "💋" },
+    { text: "laugh", icon: "😂" },
+    { text: "cry", icon: "😭" }
   ],
 
   // NEW: Sports
