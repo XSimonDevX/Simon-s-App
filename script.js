@@ -547,11 +547,11 @@ const themeSets = {
     { text: "living room", icon: "🛋️" }
   ],
   people: [
-    { image: "./img/boy.png", text: "boy", icon: "👦🏻" },
-    { image: "./img/girl.png", text: "girl", icon: "👧🏻" },
-    { image: "./img/mom.png", text: "mommy", icon: "👩‍🦰" },
-    { image: "./img/dad.png", text: "daddy", icon: "👨‍🦰" },
-    { image: "./img/grandma.png", text: "ya-ya", icon: "👵🏼" },
+    { text: "boy", icon: "👦🏻" },
+    { text: "girl", icon: "👧🏻" },
+    { text: "mommy", icon: "👩‍🦰" },
+    { text: "daddy", icon: "👨‍🦰" },
+    { text: "ya-ya", icon: "👵🏼" },
     { text: "grandpa", icon: "👴🏼" },
     { text: "baby", icon: "👶" },
     { text: "brother", icon: "👦" },
@@ -567,8 +567,6 @@ const themeSets = {
     { text: "builder", icon: "👷" },
     { text: "postman", icon: "📮" },
     { text: "neighbor", icon: "🚪" }
-  
-  ],
 
   ],
   colours: [
