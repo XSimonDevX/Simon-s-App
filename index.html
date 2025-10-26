@@ -5,33 +5,31 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Simon's App 😎👍</title>
 
-  <!-- Use absolute paths for GitHub Pages -->
+  <!-- Absolute paths for GitHub Pages -->
   <link rel="stylesheet" href="/Simon-s-App/style.css?v=72" />
-  <link rel="manifest" href="/Simon-s-App/manifest.json?v=72">
+  <link rel="manifest" href="/Simon-s-App/manifest.json?v=72" />
 
   <!-- App icons -->
-  <link rel="apple-touch-icon" href="/Simon-s-App/icons/icon-192.png">
-  <link rel="icon" sizes="192x192" href="/Simon-s-App/icons/icon-192.png">
-  <link rel="icon" sizes="512x512" href="/Simon-s-App/icons/icon-512.png">
+  <link rel="apple-touch-icon" href="/Simon-s-App/icons/icon-192.png" />
+  <link rel="icon" sizes="192x192" href="/Simon-s-App/icons/icon-192.png" />
+  <link rel="icon" sizes="512x512" href="/Simon-s-App/icons/icon-512.png" />
 
-  <meta name="theme-color" content="#007bff">
+  <meta name="theme-color" content="#007bff" />
 </head>
-
 <body>
   <header>
     <h1>Simon’s App 😎👍</h1>
   </header>
 
   <nav id="topBar" aria-label="Main sections">
-  <div class="topBar-inner">
-    <button class="tabBtn" data-target="add-card" aria-controls="add-card" aria-expanded="false"><span class="emoji">➕</span><span class="label">Add</span></button>
-    <button class="tabBtn" data-target="themes" aria-controls="themes" aria-expanded="false"><span class="emoji">🍩</span><span class="label">Themes</span></button>
-    <button class="tabBtn" data-target="library" aria-controls="library" aria-expanded="false"><span class="emoji">📁</span><span class="label">My Cards</span></button>
-    <button class="tabBtn" data-target="coreWords" aria-controls="coreWords" aria-expanded="false"><span class="emoji">💬</span><span class="label">Core Words</span></button>
-    <button class="tabBtn" data-target="sentence" aria-controls="sentence" aria-expanded="false"><span class="emoji">🧱</span><span class="label">Build</span></button>
-  </div>
-</nav>
-
+    <div class="topBar-inner">
+      <button class="tabBtn" data-target="add-card" aria-controls="add-card" aria-expanded="false"><span class="emoji">➕</span><span class="label">Add</span></button>
+      <button class="tabBtn" data-target="themes" aria-controls="themes" aria-expanded="false"><span class="emoji">🍩</span><span class="label">Themes</span></button>
+      <button class="tabBtn" data-target="library" aria-controls="library" aria-expanded="false"><span class="emoji">📁</span><span class="label">My Cards</span></button>
+      <button class="tabBtn" data-target="coreWords" aria-controls="coreWords" aria-expanded="false"><span class="emoji">💬</span><span class="label">Core Words</span></button>
+      <button class="tabBtn" data-target="sentence" aria-controls="sentence" aria-expanded="false"><span class="emoji">🧱</span><span class="label">Build</span></button>
+    </div>
+  </nav>
 
   <!-- === PANELS === -->
   <section id="add-card" class="panel">
@@ -63,56 +61,61 @@
     <div id="coreContainer"></div>
   </section>
 
- <section id="sentence" class="panel">
-  <h2>Build a Sentence</h2>
-  <button class="panelClose" data-close="sentence">✖</button>
+  <!-- ===== Build (cleaned: no duplicate IDs) ===== -->
+  <section id="sentence" class="panel">
+    <h2>Build a Sentence</h2>
+    <button class="panelClose" data-close="sentence">✖</button>
 
-  <!-- Quick words ribbon -->
-  <div id="quickWords">
-    <div class="qw-head">
-      <strong>Quick words</strong>
-      <button id="togglePicker" type="button">More…</button>
-    </div>
-    <div id="quickStrip" class="qw-strip"></div>
-  </div>
-
-  <!-- Picker drawer (hidden by default) -->
-  <div id="builderPicker" class="picker hidden" aria-hidden="true">
-    <div class="picker-bar">
-      <div class="picker-tabs">
-        <button class="pickTab active" data-tab="core" type="button">Core</button>
-        <button class="pickTab" data-tab="themes" type="button">Themes</button>
-        <button class="pickTab" data-tab="cards" type="button">My Cards</button>
+    <!-- Quick words ribbon -->
+    <div id="quickWords">
+      <div class="qw-head">
+        <strong>Quick words</strong>
+        <button id="togglePicker" type="button">More…</button>
       </div>
-      <button id="closePicker" class="picker-close" type="button" aria-label="Close">✖</button>
+      <div id="quickStrip" class="qw-strip"></div>
     </div>
 
-    <div id="pickerThemeButtons" class="miniThemeButtons"></div>
+    <!-- Picker drawer (hidden by default) -->
+    <div id="builderPicker" class="picker hidden" aria-hidden="true">
+      <div class="picker-bar">
+        <div class="picker-tabs">
+          <button class="pickTab active" data-tab="core" type="button">Core</button>
+          <button class="pickTab" data-tab="themes" type="button">Themes</button>
+          <button class="pickTab" data-tab="cards" type="button">My Cards</button>
+        </div>
+        <button id="closePicker" class="picker-close" type="button" aria-label="Close">✖</button>
+      </div>
 
-  <div id="pickerGrid" class="picker-grid"></div>
-</div>
+      <!-- Mini theme buttons appear here when 'Themes' is active -->
+      <div id="pickerThemeButtons" class="miniThemeButtons"></div>
 
-    <!-- Mini theme buttons appear here when 'Themes' is active -->
-    <div id="pickerThemeButtons" class="miniThemeBtns"></div>
+      <!-- Grid that shows Core words / Theme items / My Cards -->
+      <div id="pickerGrid" class="picker-grid"></div>
+    </div>
 
-    <!-- Grid that shows Core words / Theme items / My Cards -->
-    <div id="pickerGrid" class="picker-grid"></div>
-  </div>
+    <!-- Sentence area -->
+    <div id="sentenceArea" class="dropzone"></div>
 
-  <!-- Sentence area -->
-  <div id="sentenceArea" class="dropzone"></div>
-
-  <div class="sentenceControls">
-    <button id="playAll">▶️ Play All</button>
-    <button id="clearSentence">🗑️ Clear</button>
-  </div>
-</section>
-
+    <div class="sentenceControls">
+      <button id="playAll">▶️ Play All</button>
+      <button id="clearSentence">🗑️ Clear</button>
+    </div>
+  </section>
 
   <footer>
     <p>Made with love for my baby Simon ❤️</p>
   </footer>
 
-  <script src="script.js?v=31"></script>
+  <!-- Service worker register -->
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("/Simon-s-App/service-worker.js?v=72").catch(console.error);
+      });
+    }
+  </script>
+
+  <!-- Main script (absolute path + version bump) -->
+  <script src="/Simon-s-App/script.js?v=72"></script>
 </body>
 </html>
