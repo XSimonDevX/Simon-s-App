@@ -551,7 +551,25 @@ const themeSets = {
     { image: "./img/girl.png", text: "girl", icon: "👧🏻" },
     { image: "./img/mom.png", text: "mommy", icon: "👩‍🦰" },
     { image: "./img/dad.png", text: "daddy", icon: "👨‍🦰" },
-    { image: "./img/grandma.png", text: "ya-ya", icon: "👵🏼" } // ideally use a grandma image
+    { image: "./img/grandma.png", text: "ya-ya", icon: "👵🏼" },
+    { text: "grandpa", icon: "👴🏼" },
+    { text: "baby", icon: "👶" },
+    { text: "brother", icon: "👦" },
+    { text: "sister", icon: "👧" },
+    { text: "friend", icon: "🧑‍🤝‍🧑" },
+    { text: "teacher", icon: "👩‍🏫" },
+    { text: "doctor", icon: "👨‍⚕️" },
+    { text: "nurse", icon: "👩‍⚕️" },
+    { text: "police", icon: "👮" },
+    { text: "firefighter", icon: "👨‍🚒" },
+    { text: "chef", icon: "👩‍🍳" },
+    { text: "farmer", icon: "👩‍🌾" },
+    { text: "builder", icon: "👷" },
+    { text: "postman", icon: "📮" },
+    { text: "neighbor", icon: "🚪" }
+  
+  ],
+
   ],
   colours: [
     { text: "red",    icon: "🟥" },
