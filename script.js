@@ -787,7 +787,7 @@ const coreWords = [
 
   // quantity / control
   { text: "more", type: "quantity" }, { text: "all done", type: "quantity" },
-  { text: "one", type: "quantity" }, { text: "two", type: "quantity" },
+  { text: "one", type: "quantity" }, { text: "two", type: "quantity" }, { text: "finish", type: "quantity" },
 
   // social
   { text: "yes", type: "social" }, { text: "no", type: "social" },
