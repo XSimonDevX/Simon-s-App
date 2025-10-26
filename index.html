@@ -6,17 +6,15 @@
   <title>Simon’s App 😎👍</title>
 
   <!-- CSS -->
-  <link rel="stylesheet" href="style.css?v=76 />
+  <link rel="stylesheet" href="style.css" />
 
   <!-- Manifest + Icons -->
-  <link rel="manifest" href="manifest.json?v=76" />
+  <link rel="manifest" href="manifest.json" />
   <link rel="apple-touch-icon" href="icons/icon-192.png" />
   <link rel="icon" sizes="192x192" href="icons/icon-192.png" />
   <link rel="icon" sizes="512x512" href="icons/icon-512.png" />
-
   <meta name="theme-color" content="#007bff" />
 </head>
-
 <body>
   <header>
     <h1>Simon’s App 😎👍</h1>
@@ -88,12 +86,11 @@
       </div>
 
       <!-- Theme buttons -->
-      <div id="pickerThemeButtons" class="miniThemeButtons"></div>
+      <div id="pickerThemeButtons" class="miniThemeBtns"></div> <!-- match CSS class -->
       <!-- Grid -->
       <div id="pickerGrid" class="picker-grid"></div>
     </div>
 
-    <!-- Sentence area -->
     <div id="sentenceArea" class="dropzone"></div>
 
     <div class="sentenceControls">
@@ -106,19 +103,16 @@
     <p>Made with love for my baby Simon ❤️</p>
   </footer>
 
-  <!-- Register service worker -->
+  <!-- Register service worker (no query string) -->
   <script>
-    if ("serviceWorker" in navigator) {
-      window.addEventListener("load", () => {
-        navigator.serviceWorker
-          .register("service-worker.js?v=74")
-          .then(() => console.log("Service worker registered."))
-          .catch(console.error);
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('service-worker.js');
       });
     }
   </script>
 
-  <!-- Main JS -->
-  <script src="script.js?v=76"></script>
+  <!-- Main JS (no query string) -->
+  <script src="script.js" defer></script>
 </body>
 </html>
