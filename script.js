@@ -712,7 +712,17 @@ const themeSets = {
     { text: "swimming",   icon: "🏊" },
     { text: "cycling",    icon: "🚴" },
     { text: "skating",    icon: "⛸️" },
-    { text: "skiing",     icon: "🎿" } 
+    { text: "skiing",     icon: "🎿" },
+    { text: "snowboarding", icon: "🏂" },
+    { text: "surfing",    icon: "🏄‍♂️" },
+    { text: "boxing",     icon: "🥊" },
+    { text: "karate",     icon: "🥋" },
+    { text: "weightlifting", icon: "🏋️‍♂️" },
+    { text: "yoga",      icon: "🧘‍♂️" },
+    { text: "hiking",    icon: "🥾" },
+    { text: "bowling",   icon: "🎳" },
+    { text: "fishing",   icon: "🎣" },
+    { text: "horse riding", icon: "🏇" }
   ],
 
    // NEW: Days of the Week (with spoken phrases)
