@@ -1296,8 +1296,9 @@ async function renderPickerTab(tab) {
     const labels = {
       food:"🍎 Food", clothes:"👕 Clothes", places:"🏠 Places",
       people:"🧍 People", colours:"🎨 Colours", vehicles:"🚗 Vehicles",
-      feelings:"😊 Feelings", animals:"🐾 Animals", bodyparts:"🧍 Body Parts", activities:"🎯 Activities", sports:"🏅 Sports", days:"📅 Days of the Week", numbers:"🔢 Numbers"
-    };
+      feelings:"😊 Feelings", animals:"🐾 Animals", bodyparts:"🧍 Body Parts", activities:"🎯 Activities", sports:"🏅 Sports", days:"📅 Days of the Week", numbers:"🔢 Numbers", 
+      months: "🗓️ Months", events:"🎉 Events"
+   };
 
     if (themeBtnsHost) {
       Object.keys(sets).forEach(key => {
