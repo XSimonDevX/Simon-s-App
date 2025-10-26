@@ -630,7 +630,29 @@ const themeSets = {
     { text: "pig",      icon: "🐖" },
     { text: "cow",      icon: "🐄" },
     { text: "horse",    icon: "🐎" },
-    { text: "snake",    icon: "🐍" }
+    { text: "snake",    icon: "🐍" },
+    { text: "lion",     icon: "🦁" },
+    { text: "tiger",    icon: "🐅" },
+    { text: "bear",     icon: "🐻" },
+    { text: "rabbit",   icon: "🐇" },
+    { text: "chicken",  icon: "🐔" },
+    { text: "duck",     icon: "🦆" },
+    { text: "fish",     icon: "🐟" },
+    { text: "bird",     icon: "🐦" },
+    { text: "penguin", icon: "🐧" },
+    { text: "sheep",   icon: "🐑" },
+    { text: "mouse",   icon: "🐭" },
+    { text: "turtle",  icon: "🐢" },
+    { text: "fox",     icon: "🦊" },
+    { text: "panda",   icon: "🐼" },
+    { text: "koala",   icon: "🐨" },
+    { text: "giraffe", icon: "🦒" },
+    { text: "zebra",   icon: "🦓" },
+    { text: "whale",   icon: "🐋" },
+    { text: "dolphin", icon: "🐬" },
+    { text: "octopus", icon: "🐙" },
+    { text: "crab",    icon: "🦀" }
+    
   ],
   // NEW: Body parts
   bodyparts: [
