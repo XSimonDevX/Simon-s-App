@@ -602,15 +602,15 @@ const themeSets = {
     { text: "skiing",     icon: "🎿" } 
   ],
 
-   // NEW: Days of the Week
+   // NEW: Days of the Week (with spoken phrases)
   days: [
-    { text: "Monday", icon: "🌞" },
-    { text: "Tuesday", icon: "🌤️" },
-    { text: "Wednesday", icon: "☀️" },
-    { text: "Thursday", icon: "🌈" },
-    { text: "Friday", icon: "😎" },
-    { text: "Saturday", icon: "🎉" },
-    { text: "Sunday", icon: "🛌" }
+    { text: "Monday",    icon: "🌞", speak: "It's Monday" },
+    { text: "Tuesday",   icon: "🌤️", speak: "It's Tuesday" },
+    { text: "Wednesday", icon: "☀️", speak: "It's Wednesday" },
+    { text: "Thursday",  icon: "🌈", speak: "It's Thursday" },
+    { text: "Friday",    icon: "😎", speak: "It's Friday" },
+    { text: "Saturday",  icon: "🎉", speak: "It's Saturday" },
+    { text: "Sunday",    icon: "🛌", speak: "It's Sunday" }
   ],
 
   // NEW: Numbers 1–10
