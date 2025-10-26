@@ -654,7 +654,7 @@ footer p {
 
 /* === Color Enhancements & Theming === */
 
-/* 🌈 Gradient header bar */
+/* 🌈 Gradient header bar (fixed text contrast) */
 header {
   background: linear-gradient(90deg, #0b5ed7, #4798ff);
   color: #ffffff;
@@ -670,7 +670,11 @@ header h1 {
   font-size: 30px;
   letter-spacing: 0.5px;
   font-family: "Poppins", "Segoe UI", sans-serif;
+  font-weight: 700;
+  color: #ffffff; /* ✅ bright white text */
+  text-shadow: 0 1px 3px rgba(0,0,0,0.4); /* ✅ adds contrast glow */
 }
+
 
 /* 🧩 Add soft pastel tints to each top tile */
 #topBar .tabBtn:nth-child(1) {
