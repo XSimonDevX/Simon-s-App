@@ -1042,7 +1042,7 @@ window.addEventListener('resize', () => setTimeout(fitBodyBelowNav, 50));
 
 // 1) Quick Words: small, always-available chips
 const QUICK_WORDS = [
-  "I","you","me","want","go","help","more","all done","yes","no","now","later","thank you"
+  "I","you","me","want","go","to","help","more","all done","yes","no","now","later","thank you","love","play","eat","home","sleep","school","food","pizza","kfc","ice cream" 
 ];
 
 function renderQuickWords() {
