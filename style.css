@@ -562,3 +562,92 @@ h1, h2, h3 {
   border-radius: 8px;
   margin-bottom: 6px;
 }
+
+/* === Fresh Modern Theme === */
+
+/* Background gradient and base colors */
+body {
+  background: linear-gradient(180deg, #f0f4ff 0%, #ffffff 100%);
+  color: #222;
+}
+
+/* Section cards */
+section {
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+  border: 1px solid #e4e9f5;
+}
+
+/* Headers */
+h1, h2 {
+  color: #0b5ed7;
+  font-family: "Poppins", "Segoe UI", sans-serif;
+  font-weight: 700;
+}
+
+/* Buttons: soft gradient + hover */
+button {
+  background: linear-gradient(135deg, #0b5ed7, #3c8cff);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(11, 94, 215, 0.3);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(11, 94, 215, 0.35);
+}
+
+/* TopBar tiles: softer blue-white cards */
+#topBar .tabBtn {
+  background: linear-gradient(180deg, #f7faff 0%, #edf3ff 100%);
+  border: 1px solid #d4defa;
+  border-radius: 18px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.06);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+#topBar .tabBtn:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+}
+
+/* Core cards & theme cards pop a little more */
+.card, .core-card {
+  background: #f3f7ff;
+  border: 1px solid #d6e1ff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+/* Sticky dock lighter & glassy */
+#sentence.dock {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(6px);
+  border-top: 1px solid #d5def7;
+}
+
+/* Quick words ribbon */
+#quickWords {
+  background: #f8fbff;
+  border: 1px solid #d8e2f8;
+}
+
+/* Chips */
+.qw-chip {
+  background: #ffffff;
+  border: 2px solid #cfdaf9;
+  color: #0b5ed7;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+/* Footer */
+footer {
+  background: transparent;
+  color: #333;
+  font-weight: 600;
+  margin-top: 30px;
+}
+footer p {
+  color: #555;
+}
