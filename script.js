@@ -763,6 +763,29 @@ const themeSets = {
     { text: "October", icon: "🎃" },
     { text: "November", icon: "🦃" },
     { text: "December", icon: "🎄" }
+   ],
+
+    events: [
+    { text: "birthday", icon: "🎂" },
+    { text: "party", icon: "🎉" },
+    { text: "Christmas", icon: "🎄" },
+    { text: "Easter", icon: "🐣" },
+    { text: "Halloween", icon: "🎃" },
+    { text: "New Year", icon: "🎆" },
+    { text: "wedding", icon: "💍" },
+    { text: "holiday", icon: "🏖️" },
+    { text: "school day", icon: "🏫" },
+    { text: "sports day", icon: "🏅" },
+    { text: "picnic", icon: "🧺" },
+    { text: "concert", icon: "🎵" },
+    { text: "movie night", icon: "🎬" },
+    { text: "BBQ", icon: "🍔" },
+    { text: "playdate", icon: "🤸‍♂️" },
+    { text: "rainy day", icon: "🌧️" },
+    { text: "fireworks", icon: "🎇" },
+    { text: "trip", icon: "✈️" },
+    { text: "graduation", icon: "🎓" },
+    { text: "visit Santa", icon: "🎅" }
   
 };
 
@@ -799,6 +822,7 @@ function renderThemeButtons() {
     days: "📅 Days of the Week",
     numbers: "🔢 Numbers",
     months:"📅 Months",
+     events: "🎉 Events",
 
   };
 
