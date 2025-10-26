@@ -1397,6 +1397,224 @@ document.querySelectorAll(".pickTab").forEach(btn => {
 // 4) Initialize Quick Words on load
 window.addEventListener("load", renderQuickWords);
 
+/* ========================
+   PLAY PANEL CONTROLLER
+======================== */
+
+// Show the Play panel buttons
+const playBtn = document.querySelector('[data-target="play"]');
+const btnDino = document.getElementById('btnDino');
+const btnQuiz = document.getElementById('btnQuiz');
+const dinoWrap = document.getElementById('dinoWrap');
+const quizWrap = document.getElementById('quizWrap');
+
+btnDino?.addEventListener('click', () => {
+  quizWrap.style.display = 'none';
+  dinoWrap.style.display = 'block';
+  startDino();     // (re)start safely
+});
+btnQuiz?.addEventListener('click', () => {
+  dinoStop();
+  dinoWrap.style.display = 'none';
+  quizWrap.style.display = 'block';
+  startQuiz('Animals'); // theme key
+});
+
+/* ========================
+   DINO JUMP (canvas)
+======================== */
+let dinoRAF = null, dinoState = null;
+
+function startDino(){
+  const canvas = document.getElementById('dinoCanvas');
+  if (!canvas) return;
+  const c = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+
+  // State
+  dinoState = {
+    x: 60, y: H-50, vy: 0, onGround:true,
+    gravity: 0.65, jumpV: -11,
+    obst: [], speed: 4.5, score: 0, t: 0, dead: false
+  };
+
+  function spawn() {
+    dinoState.obst.push({ x: W + Math.random()*120, y: H-40, w: 16+Math.random()*18, h: 24+Math.random()*18 });
+  }
+
+  function jump(){
+    if (!dinoState || dinoState.dead) return;
+    if (dinoState.onGround){
+      dinoState.vy = dinoState.jumpV;
+      dinoState.onGround = false;
+    }
+  }
+
+  // Input
+  canvas.onpointerdown = jump;
+  window.addEventListener('keydown', e => { if (e.code === 'Space') jump(); });
+
+  // Loop
+  function loop(){
+    if (!dinoState) return;
+    dinoState.t++;
+    c.clearRect(0,0,W,H);
+
+    // ground
+    c.fillStyle = '#cfe1ff';
+    c.fillRect(0, H-28, W, 2);
+
+    // player
+    dinoState.vy += dinoState.gravity;
+    dinoState.y += dinoState.vy;
+    if (dinoState.y >= H-50) { dinoState.y = H-50; dinoState.vy = 0; dinoState.onGround = true; }
+
+    c.fillStyle = '#0b5ed7';
+    c.fillRect(dinoState.x, dinoState.y-20, 26, 20);     // body
+    c.fillRect(dinoState.x-6, dinoState.y-10, 12, 10);   // head
+
+    // obstacles
+    if (dinoState.t % 80 === 0) spawn();
+    c.fillStyle = '#ff6b6b';
+    for (let i = dinoState.obst.length-1; i >= 0; i--){
+      const o = dinoState.obst[i];
+      o.x -= dinoState.speed;
+      c.fillRect(o.x, o.y - o.h, o.w, o.h);
+      // collision
+      const px = dinoState.x, py = dinoState.y-20, pw = 26, ph = 20;
+      if (px < o.x+o.w && px+pw > o.x && py < o.y && py+ph > o.y-o.h){
+        dinoState.dead = true;
+      }
+      if (o.x+o.w < 0) { dinoState.obst.splice(i,1); dinoState.score++; }
+    }
+
+    // score
+    c.fillStyle = '#334';
+    c.font = 'bold 16px system-ui, sans-serif';
+    c.fillText(`Score: ${dinoState.score}`, 12, 20);
+
+    if (dinoState.dead){
+      c.fillStyle = 'rgba(0,0,0,.45)';
+      c.fillRect(0,0,W,H);
+      c.fillStyle = '#fff';
+      c.font = 'bold 22px system-ui, sans-serif';
+      c.fillText('Game over — tap to restart', 160, 110);
+      canvas.onpointerdown = () => { dinoStop(); startDino(); };
+      cancelAnimationFrame(dinoRAF);
+      return;
+    }
+
+    dinoRAF = requestAnimationFrame(loop);
+  }
+  cancelAnimationFrame(dinoRAF);
+  loop();
+}
+
+function dinoStop(){
+  if (dinoRAF) cancelAnimationFrame(dinoRAF);
+  dinoRAF = null;
+  dinoState = null;
+}
+
+/* ========================
+   FIND THE CARD (drag & drop)
+======================== */
+
+const QUIZ_DATA = {
+  Animals: [
+    { name:'elephant', img:'https://upload.wikimedia.org/wikipedia/commons/3/37/African_Bush_Elephant.jpg' },
+    { name:'lion',     img:'https://upload.wikimedia.org/wikipedia/commons/7/73/Lion_waiting_in_Namibia.jpg' },
+    { name:'zebra',    img:'https://upload.wikimedia.org/wikipedia/commons/0/0f/Burchell%27s_zebra%2C_foo.jpg' },
+    { name:'giraffe',  img:'https://upload.wikimedia.org/wikipedia/commons/9/9f/Giraffa_camelopardalis_reticulata.jpg' },
+    { name:'monkey',   img:'https://upload.wikimedia.org/wikipedia/commons/2/26/Crab-eating_Macaque_%28Macaca_fascicularis%29_Photograph_By_Shantanu_Kuveskar.jpg' },
+    { name:'panda',    img:'https://upload.wikimedia.org/wikipedia/commons/0/0f/Grosser_Panda.JPG' },
+    { name:'bear',     img:'https://upload.wikimedia.org/wikipedia/commons/0/0b/Ursus_arctos_arctos_Linnaeus_1758.jpg' },
+    { name:'tiger',    img:'https://upload.wikimedia.org/wikipedia/commons/5/56/Tiger.50.jpg' },
+    { name:'fox',      img:'https://upload.wikimedia.org/wikipedia/commons/1/1f/Fox_-_British_Wildlife_Centre_%284478199264%29.jpg' },
+    { name:'penguin',  img:'https://upload.wikimedia.org/wikipedia/commons/e/e6/Emperor_Penguin_chicks.jpg' }
+  ]
+};
+// You can replace these URLs with your own local images later (and add more themes).
+
+let quizIndex = 0, quizSet = [], quizAnswer = null;
+
+function startQuiz(themeKey){
+  const set = QUIZ_DATA[themeKey];
+  if (!set) return;
+  // pick up to 10 unique cards per round
+  quizSet = shuffle([...set]).slice(0, 10);
+  quizIndex = 0;
+  nextQuestion();
+}
+
+function nextQuestion(){
+  if (quizIndex >= quizSet.length){
+    say('Great job! All done.');
+    document.getElementById('quizStatus').textContent = '🎉 Great job! You finished this set.';
+    return;
+  }
+  const pool = shuffle([...quizSet]);
+  const choices = pool.slice(0, Math.min(6, pool.length)); // 6 choices
+  quizAnswer = choices[Math.floor(Math.random()*choices.length)];
+  renderQuiz(choices, quizAnswer);
+  quizIndex++;
+}
+
+function renderQuiz(choices, answer){
+  const q = document.getElementById('quizQuestion');
+  const grid = document.getElementById('quizGrid');
+  const drop = document.getElementById('dropZone');
+  const status = document.getElementById('quizStatus');
+
+  q.textContent = answer.name;
+  status.textContent = '';
+  drop.classList.remove('ok','no');
+  drop.textContent = 'Drop here';
+
+  grid.innerHTML = choices.map(c => cardHTML(c)).join('');
+
+  // DnD events
+  grid.querySelectorAll('.game-card').forEach(el => {
+    el.addEventListener('dragstart', e => {
+      e.dataTransfer.setData('text/plain', el.dataset.name);
+    });
+  });
+  drop.ondragover = e => e.preventDefault();
+  drop.ondragenter = e => drop.style.filter = 'brightness(1.02)';
+  drop.ondragleave = e => drop.style.filter = '';
+  drop.ondrop = e => {
+    e.preventDefault();
+    drop.style.filter = '';
+    const name = e.dataTransfer.getData('text/plain');
+    if (!name) return;
+    if (name === answer.name){
+      drop.classList.add('ok'); drop.classList.remove('no');
+      drop.textContent = '✅ Correct!';
+      say('Great job!');
+      setTimeout(nextQuestion, 700);
+    } else {
+      drop.classList.add('no'); drop.classList.remove('ok');
+      drop.textContent = '❌ Try again';
+      say('Oh no, try again');
+      setTimeout(() => { drop.textContent='Drop here'; drop.classList.remove('no'); }, 600);
+    }
+  };
+}
+
+function cardHTML(c){
+  return `
+    <div class="game-card" draggable="true" data-name="${c.name}">
+      <img src="${c.img}" alt="${c.name}">
+      <p>${capitalize(c.name)}</p>
+    </div>
+  `;
+}
+
+function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]= [a[j],a[i]]; } return a; }
+function capitalize(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
+function say(text){ try{ const u=new SpeechSynthesisUtterance(text); u.rate=1; speechSynthesis.speak(u);}catch{} }
+
+
 // ===== INIT =====
 (async function init() {
   await displayCards();
