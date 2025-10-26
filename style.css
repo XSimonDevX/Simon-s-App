@@ -721,3 +721,25 @@ button:hover {
 body {
   background: linear-gradient(180deg, #f2f6ff 0%, #ffffff 100%);
 }
+/* --- Play panel --- */
+.drop-target{
+  margin: 10px auto 14px;
+  max-width: 560px;
+  min-height: 70px;
+  display:flex; align-items:center; justify-content:center;
+  border:2px dashed #94b0ff; border-radius:12px;
+  background:#f7fbff; color:#0b5ed7; font-weight:800;
+}
+.quiz-grid{
+  display:grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap:10px; max-width: 720px; margin: 0 auto;
+}
+.game-card{
+  background:#fff; border:1px solid #dfe6f7; border-radius:12px;
+  padding:10px; text-align:center; user-select:none; cursor:grab;
+  box-shadow:0 2px 6px rgba(0,0,0,.06);
+}
+.game-card img{ width:80px; height:80px; object-fit:cover; border-radius:10px; }
+.game-card p{ margin:6px 0 0; font-weight:700; }
+.drop-target.ok{ border-color:#35c46a; background:#f1fff6; color:#187a44; }
+.drop-target.no{ border-color:#ff6b6b; background:#fff5f5; color:#b32020; }
