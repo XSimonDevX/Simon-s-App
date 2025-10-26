@@ -1,5 +1,5 @@
 // Bump this any time you want clients to fetch a fresh bundle
-const CACHE_NAME = "flashcards-v79";
+const CACHE_NAME = "flashcards-v80";
 
 // Build a base path from the SW scope (works on GitHub Pages subpath)
 const BASE = self.registration.scope.replace(/\/$/, "");
@@ -8,9 +8,9 @@ const BASE = self.registration.scope.replace(/\/$/, "");
 const ASSETS = [
   `${BASE}/`,
   `${BASE}/index.html`,
-  `${BASE}/style.css?v=79`,
-  `${BASE}/script.js?v=79`,
-  `${BASE}/manifest.json?v=79`,
+  `${BASE}/style.css?v=80`,
+  `${BASE}/script.js?v=80`,
+  `${BASE}/manifest.json?v=80`,
   `${BASE}/icons/icon-192.png`,
   `${BASE}/icons/icon-512.png`
   // add theme images here if you want them pre-cached:
