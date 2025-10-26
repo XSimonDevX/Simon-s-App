@@ -786,6 +786,7 @@ const themeSets = {
     { text: "trip", icon: "✈️" },
     { text: "graduation", icon: "🎓" },
     { text: "visit Santa", icon: "🎅" }
+  ],
   
 };
 
