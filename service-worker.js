@@ -1,9 +1,9 @@
-const CACHE_NAME = "flashcards-v68-idb";
+const CACHE_NAME = "flashcards-v69-idb";
 const ASSETS = [
   "./",
   "./index.html",
   "./style.css",
-  "./script.js?v=68",
+  "./script.js?v=69",
   "./manifest.json",
   "./icon-192.png",
   "./icon-512.png",
