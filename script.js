@@ -514,7 +514,14 @@ const themeSets = {
     { image: "./img/pants.png", text: "pants", icon: "👖" },
     { image: "./img/shoes.png", text: "shoes", icon: "👟" },
     { image: "./img/hat.png", text: "hat", icon: "🧢" },
-    { image: "./img/socks.png", text: "socks", icon: "🧦" }
+    { image: "./img/socks.png", text: "socks", icon: "🧦" },
+    { text: "coat", icon: "🧥" },
+    { text: "shorts", icon: "🩳" },
+    { text: "gloves", icon: "🧤" },
+    { text: "scarf", icon: "🧣" },
+    { text: "boots", icon: "🥾" },
+    { text: "sandals", icon: "🩴" },
+    { text: "pyjamas", icon: "🛌" }
   ],
   places: [
     { image: "./img/beach.png", text: "beach", icon: "🏖️" },
