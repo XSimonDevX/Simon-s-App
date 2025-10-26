@@ -1,4 +1,4 @@
-const CACHE_NAME = "flashcards-v66-idb";
+const CACHE_NAME = "flashcards-v67-idb";
 const ASSETS = [
   "./",
   "./index.html",
