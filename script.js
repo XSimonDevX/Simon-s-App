@@ -1408,12 +1408,12 @@ function say(text){ try{ const u=new SpeechSynthesisUtterance(text); u.rate=1; s
 
 /* =======================================================
    CONTAINER-AT-TOP + JS-ONLY HIGHLIGHT + SCROLL-TO-TOP-ON-CLOSE
-   (drop-in replacement)
+   (stable, replaces previous patch completely)
    ======================================================= */
 
-const FORCE_TOP   = true;   // true = put opened container's top at the very top of the screen
-const JUMP_EXTRA  = 24;     // only used if FORCE_TOP = false
-const PULSE_MS    = 1000;   // exact highlight duration (1s)
+const FORCE_TOP  = true;   // true = put opened container's top exactly at the top of the screen
+const JUMP_EXTRA = 24;     // only used if FORCE_TOP=false
+const PULSE_MS   = 1000;   // highlight duration (1s)
 
 /* ---------- keep a CSS var for the top bar height ---------- */
 function __setNavOffsetVar() {
@@ -1440,33 +1440,25 @@ function __getScrollParent(node) {
 function __pulseContainer(container, duration = PULSE_MS) {
   if (!container) return;
 
-  // focus for SRs (prevent native focus ring visually)
+  // focus for SRs without leaving a lingering ring
   try { container.setAttribute('tabindex', '-1'); container.focus({ preventScroll: true }); } catch {}
 
-  // save inline styles to restore precisely
   const prevBoxShadow  = container.style.boxShadow;
   const prevOutline    = container.style.outline;
   const prevTransition = container.style.transition;
 
-  // suppress native outline during pulse
-  container.style.outline = 'none';
+  container.style.outline    = 'none';
   container.style.transition = 'box-shadow ' + duration + 'ms ease-out';
+  container.style.boxShadow  = '0 0 0 10px rgba(79,158,248,0.85)';
 
-  // start strong…
-  container.style.boxShadow = '0 0 0 10px rgba(79,158,248,0.85)';
-
-  // …then fade to subtle on next frame
   requestAnimationFrame(() => {
     container.style.boxShadow = '0 0 0 3px rgba(79,158,248,0.35)';
   });
 
-  // clean up after exactly duration
   setTimeout(() => {
     container.style.transition = prevTransition;
     container.style.boxShadow  = prevBoxShadow;
     container.style.outline    = prevOutline;
-
-    // blur + remove tabindex so no outline snaps back and no stray focus remains
     try { container.blur(); } catch {}
     container.removeAttribute('tabindex');
   }, duration);
@@ -1476,17 +1468,17 @@ function __pulseContainer(container, duration = PULSE_MS) {
 function __scrollContainerToTop(container) {
   if (!container) return;
 
-  const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const reduce   = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const behavior = reduce ? 'auto' : 'smooth';
 
   const navOffsetStr = getComputedStyle(document.documentElement).getPropertyValue('--nav-offset').trim() || '0px';
-  const navOffset = parseFloat(navOffsetStr) || 0;
+  const navOffset    = parseFloat(navOffsetStr) || 0;
 
   const offset = FORCE_TOP ? 0 : (navOffset + JUMP_EXTRA);
-  const mt = parseFloat(getComputedStyle(container).marginTop) || 0;
+  const mt     = parseFloat(getComputedStyle(container).marginTop) || 0;
 
   const parent = __getScrollParent(container);
-  const rect = container.getBoundingClientRect();
+  const rect   = container.getBoundingClientRect();
 
   if (parent === window) {
     const y = rect.top + window.pageYOffset - offset - mt;
@@ -1539,9 +1531,8 @@ document.addEventListener('click', (e) => {
   }, 0);
 });
 
-/* ---------- SAFETY NETS: observe opens/renders ---------- */
+/* ---------- SAFETY NET: jump when a panel actually becomes active ---------- */
 (function () {
-  // any panel gaining 'active'
   document.querySelectorAll('section.panel').forEach(panel => {
     const obs = new MutationObserver(muts => {
       for (const m of muts) {
@@ -1553,23 +1544,9 @@ document.addEventListener('click', (e) => {
     });
     obs.observe(panel, { attributes: true, attributeFilter: ['class'] });
   });
-
-  // theme grid rendering
-  const themeContainer = document.getElementById('themeContainer');
-  if (themeContainer) {
-    const obs = new MutationObserver(muts => {
-      for (const m of muts) {
-        if (m.type === 'childList' && m.addedNodes && m.addedNodes.length) {
-          __jumpToContainer(themeContainer);
-          break;
-        }
-      }
-    });
-    obs.observe(themeContainer, { childList: true });
-  }
 })();
 
-/* ---------- SCROLL TO TOP when a container is CLOSED ---------- */
+/* ---------- SCROLL TO TOP when a container is CLOSED (stateful) ---------- */
 function __scrollRootToTop(fromEl) {
   const parent = __getScrollParent(fromEl || document.body);
   if (parent === window) {
@@ -1579,27 +1556,32 @@ function __scrollRootToTop(fromEl) {
   }
 }
 
-// wrap closePanel so closing any container returns to the top/menu
+// Wrap closePanel (primary path)
 (function () {
-  if (typeof window.closePanel !== 'function') return;
-  const __orig = window.closePanel;
-  window.closePanel = function(id) {
-    const r = __orig.apply(this, arguments);
-    const panel = document.getElementById(id);
-    __scrollRootToTop(panel || document.body);
-    return r;
-  };
+  if (typeof window.closePanel === 'function') {
+    const __orig = window.closePanel;
+    window.closePanel = function(id) {
+      const r = __orig.apply(this, arguments);
+      queueMicrotask(() => __scrollRootToTop());
+      return r;
+    };
+  }
 })();
 
-// also intercept Escape-close and explicit .panelClose buttons already call closePanel,
-// but in case any code removes 'active' directly, observe and scroll up:
+// Observe real transitions: active -> inactive ONLY
 (function () {
+  const wasActive = new WeakMap();
   document.querySelectorAll('section.panel').forEach(panel => {
+    wasActive.set(panel, panel.classList.contains('active'));
     const obs = new MutationObserver(muts => {
       for (const m of muts) {
-        if (m.type === 'attributes' && m.attributeName === 'class' && !panel.classList.contains('active')) {
-          __scrollRootToTop(panel);
-          break;
+        if (m.type === 'attributes' && m.attributeName === 'class') {
+          const now  = panel.classList.contains('active');
+          const prev = wasActive.get(panel);
+          if (prev === true && now === false) {
+            __scrollRootToTop(panel);
+          }
+          wasActive.set(panel, now);
         }
       }
     });
@@ -1619,7 +1601,6 @@ function __scrollRootToTop(fromEl) {
       try { localStorage.removeItem('lastPanel'); } catch {}
       const tc = document.getElementById('themeContainer');
       if (tc) tc.innerHTML = '';
-      // also ensure we are at the very top at app start
       __scrollRootToTop(document.body);
     } catch {}
   }
@@ -1627,47 +1608,6 @@ function __scrollRootToTop(fromEl) {
     setTimeout(forceCloseAll, 0);
     setTimeout(forceCloseAll, 50);
   } else {
-    window.addEventListener('load', () => {
-      setTimeout(forceCloseAll, 0);
-      setTimeout(forceCloseAll, 50);
-    });
-  }
-})();
- __jumpToContainer(themeContainer); // ⬅️ container itself
-          break;
-        }
-      }
-    });
-    obs.observe(themeContainer, { childList: true });
-  }
-})();
-
-/* ===== Force-start CLOSED (runs after your own load handlers) ===== */
-(function () {
-  function forceCloseAll() {
-    try {
-      // Close any panels that were auto-opened
-      document.querySelectorAll('section.panel').forEach(p => p.classList.remove('active'));
-      // Deactivate tab buttons
-      document.querySelectorAll('#topBar .tabBtn').forEach(b => {
-        b.classList.remove('active');
-        b.setAttribute('aria-expanded', 'false');
-      });
-      // Don’t reopen last panel next time
-      try { localStorage.removeItem('lastPanel'); } catch {}
-      // If a theme grid auto-rendered, clear it
-      const tc = document.getElementById('themeContainer');
-      if (tc) tc.innerHTML = '';
-    } catch {}
-  }
-
-  // Run after your other window.onload handlers
-  if (document.readyState === 'complete') {
-    // page already loaded
-    setTimeout(forceCloseAll, 0);
-    setTimeout(forceCloseAll, 50);
-  } else {
-    // ensure we fire after other onload callbacks
     window.addEventListener('load', () => {
       setTimeout(forceCloseAll, 0);
       setTimeout(forceCloseAll, 50);
