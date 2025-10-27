@@ -1406,113 +1406,12 @@ function say(text){ try{ const u=new SpeechSynthesisUtterance(text); u.rate=1; s
   displayCoreWords();
 })();
 
-/* ===============================
-   AUTO-JUMP PATCH (safe drop-in)
-   Paste this at the VERY END of your JS file.
-   =============================== */
-
-// 1) helper: smooth, offset-aware jump (respects reduced motion)
-function __jumpTo(el, { smooth = true } = {}) {
-  if (!el) return;
-
-  // respect reduced motion
-  const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const behavior = (smooth && !reduced) ? 'smooth' : 'auto';
-
-  // align with fixed top bar using a CSS var we keep updated
-  const navOffset =
-    getComputedStyle(document.documentElement).getPropertyValue('--nav-offset') || '0px';
-  el.style.scrollMarginTop = (navOffset && navOffset.trim()) || '0px';
-
-  requestAnimationFrame(() => {
-    try {
-      el.scrollIntoView({ block: 'start', behavior });
-      // accessibility: focus so SRs announce new context
-      el.setAttribute('tabindex', '-1');
-      el.focus({ preventScroll: true });
-    } catch {}
-  });
-}
-
-// 2) keep a --nav-offset CSS var updated alongside your fixed top bar
-function __setNavOffsetVar() {
-  const bar = document.getElementById('topBar');
-  const px = bar ? (bar.offsetHeight + 12) + 'px' : '0px';
-  document.documentElement.style.setProperty('--nav-offset', px);
-}
-// run now and on resize (in case your existing handlers don’t set the var)
-window.addEventListener('load', __setNavOffsetVar);
-window.addEventListener('resize', () => setTimeout(__setNavOffsetVar, 50));
-
-// 3) auto-jump whenever a theme is shown
-(function __patchShowTheme() {
-  // if showTheme exists, wrap it to jump after render
-  if (typeof window.showTheme === 'function') {
-    const __origShowTheme = window.showTheme;
-    window.showTheme = function(set) {
-      const result = __origShowTheme.apply(this, arguments);
-      // #themeContainer is where the category renders in your code
-      const container = document.getElementById('themeContainer');
-      if (container) __jumpTo(container);
-      return result;
-    };
-  }
-
-  // also catch clicks on the dynamically created theme buttons
-  // (works even if renderThemeButtons gets called later)
-  document.addEventListener('click', (e) => {
-    const btn = e.target.closest('.themeBtn');
-    if (!btn) return;
-    // give your existing click handler a tick to render, then jump
-    setTimeout(() => {
-      const container = document.getElementById('themeContainer');
-      if (container) __jumpTo(container);
-    }, 0);
-  });
-})();
-
-// 4) optional: auto-jump to any panel you open via showPanel(..)
-// (safe wrapper; remove if you don’t want this)
-(function __patchShowPanel() {
-  if (typeof window.showPanel !== 'function') return;
-  const __origShowPanel = window.showPanel;
-  window.showPanel = function(id) {
-    const r = __origShowPanel.apply(this, arguments);
-    const panel = document.getElementById(id);
-    if (panel) __jumpTo(panel);
-    return r;
-  };
-})();
-
 /* =======================================================
-   START-CLOSED + ALWAYS-JUMP PATCH (drop-in, safe)
-   Paste this at the VERY END of your JS file.
+   CONSOLIDATED: START CLOSED + ALWAYS JUMP (safe drop-in)
+   Paste at the VERY END of your JS file. Remove older patches first.
    ======================================================= */
 
-// --- helper: smooth, offset-aware jump (respects reduced motion)
-function __jumpTo(el, { smooth = true } = {}) {
-  if (!el) return;
-
-  const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const behavior = (smooth && !reduced) ? 'smooth' : 'auto';
-
-  // align with fixed top bar using a CSS var
-  const navOffset =
-    getComputedStyle(document.documentElement).getPropertyValue('--nav-offset') || '0px';
-  el.style.scrollMarginTop = (navOffset && navOffset.trim()) || '0px';
-
-  // jump after layout settles
-  requestAnimationFrame(() => {
-    try {
-      el.scrollIntoView({ block: 'start', behavior });
-      // A11y: move focus so SRs announce the new context
-      el.setAttribute('tabindex', '-1');
-      el.focus({ preventScroll: true });
-    } catch {}
-  });
-}
-
-// --- keep --nav-offset in sync with your fixed top bar
+// --- figure out the top bar offset and expose it as a CSS var
 function __setNavOffsetVar() {
   const bar = document.getElementById('topBar');
   const px = bar ? (bar.offsetHeight + 12) + 'px' : '0px';
@@ -1520,13 +1419,59 @@ function __setNavOffsetVar() {
 }
 window.addEventListener('load', __setNavOffsetVar);
 window.addEventListener('resize', () => setTimeout(__setNavOffsetVar, 50));
+
+// --- find the nearest scrollable ancestor (or window)
+function __getScrollParent(node) {
+  let p = node && node.parentElement;
+  const rx = /(auto|scroll|overlay)/;
+  while (p && p !== document.body) {
+    const style = getComputedStyle(p);
+    const overflowY = style.overflowY;
+    if (rx.test(overflowY) && p.scrollHeight > p.clientHeight) return p;
+    p = p.parentElement;
+  }
+  return window; // fallback to the page
+}
+
+// --- scroll to an element with an offset for the fixed header
+function __scrollToWithOffset(target, { smooth = true } = {}) {
+  if (!target) return;
+
+  const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const behavior = (smooth && !reduced) ? 'smooth' : 'auto';
+
+  const navOffsetStr =
+    getComputedStyle(document.documentElement).getPropertyValue('--nav-offset').trim() || '0px';
+  const navOffset = parseFloat(navOffsetStr) || 0;
+
+  const parent = __getScrollParent(target);
+  const rect = target.getBoundingClientRect();
+
+  if (parent === window) {
+    const y = rect.top + window.pageYOffset - navOffset;
+    window.scrollTo({ top: y, behavior });
+  } else {
+    const parentRect = parent.getBoundingClientRect();
+    const y = (rect.top - parentRect.top) + parent.scrollTop - navOffset;
+    parent.scrollTo({ top: y, behavior });
+  }
+
+  // A11y: focus so screen readers announce the new context
+  target.setAttribute('tabindex', '-1');
+  try { target.focus({ preventScroll: true }); } catch {}
+}
+
+// --- convenience wrapper
+function __jumpTo(el) {
+  // wait a frame so layout after class changes/render is settled
+  requestAnimationFrame(() => __scrollToWithOffset(el));
+}
 
 /* --------------------------
    1) START CLOSED ON LOAD
    -------------------------- */
 window.addEventListener('load', () => {
   try {
-    // Close all panels and buttons
     if (typeof panels !== 'undefined' && Array.isArray(panels)) {
       panels.forEach(p => p.classList.remove('active'));
     }
@@ -1536,21 +1481,16 @@ window.addEventListener('load', () => {
         b.setAttribute('aria-expanded', 'false');
       });
     }
-    // Prevent auto-reopen of last panel
     localStorage.removeItem('lastPanel');
   } catch {}
 });
 
 /* --------------------------------------------
    2) ALWAYS JUMP WHEN A CONTAINER/CATEGORY OPENS
-   Works for:
-   - showPanel(id) (your top menu containers)
-   - showTheme(set) (your category grids)
-   - direct .themeBtn clicks (dynamic)
    -------------------------------------------- */
 
-// Wrap showPanel to jump after it opens
-(function __patchShowPanel() {
+// Wrap showPanel to jump after open
+(function () {
   if (typeof window.showPanel !== 'function') return;
   const __orig = window.showPanel;
   window.showPanel = function(id) {
@@ -1561,20 +1501,19 @@ window.addEventListener('load', () => {
   };
 })();
 
-// Wrap showTheme to jump after it renders the grid
-(function __patchShowTheme() {
-  if (typeof window.showTheme === 'function') {
-    const __orig = window.showTheme;
-    window.showTheme = function(set) {
-      const r = __orig.apply(this, arguments);
-      const container = document.getElementById('themeContainer');
-      if (container) __jumpTo(container);
-      return r;
-    };
-  }
+// Wrap showTheme to jump after the grid renders
+(function () {
+  if (typeof window.showTheme !== 'function') return;
+  const __orig = window.showTheme;
+  window.showTheme = function(set) {
+    const r = __orig.apply(this, arguments);
+    const container = document.getElementById('themeContainer');
+    if (container) __jumpTo(container);
+    return r;
+  };
 })();
 
-// If someone clicks a theme button, wait a tick for render then jump
+// If theme buttons are clicked, jump after render (covers dynamic creation)
 document.addEventListener('click', (e) => {
   const btn = e.target.closest('.themeBtn');
   if (!btn) return;
@@ -1585,36 +1524,36 @@ document.addEventListener('click', (e) => {
 });
 
 /* ----------------------------------------------------------------
-   3) MAKE IT BULLETPROOF: OBSERVE CHANGES AND JUMP EVERY TIME
-   If some code path opens things without calling showPanel/showTheme,
-   this MutationObserver will still catch it and scroll.
+   3) SAFETY NETS: observe changes and jump every time something opens
    ---------------------------------------------------------------- */
-(function __observeOpens() {
-  // Panels: jump when any section.panel gains 'active'
+
+// Panels: when any section.panel gains 'active'
+(function () {
   const allPanels = document.querySelectorAll('section.panel');
   allPanels.forEach(panel => {
     const obs = new MutationObserver(muts => {
-      muts.forEach(m => {
-        if (m.type === 'attributes' && m.attributeName === 'class') {
-          if (panel.classList.contains('active')) __jumpTo(panel);
-        }
-      });
-    });
-    obs.observe(panel, { attributes: true });
-  });
-
-  // Theme/category grid: jump when new items are rendered
-  const themeContainer = document.getElementById('themeContainer');
-  if (themeContainer) {
-    const obs2 = new MutationObserver(muts => {
       for (const m of muts) {
-        if (m.type === 'childList' && (m.addedNodes && m.addedNodes.length)) {
-          __jumpTo(themeContainer);
+        if (m.type === 'attributes' && m.attributeName === 'class' && panel.classList.contains('active')) {
+          __jumpTo(panel);
           break;
         }
       }
     });
-    obs2.observe(themeContainer, { childList: true });
-  }
+    obs.observe(panel, { attributes: true, attributeFilter: ['class'] });
+  });
 })();
 
+// Theme/category grid: when new items are rendered
+(function () {
+  const themeContainer = document.getElementById('themeContainer');
+  if (!themeContainer) return;
+  const obs = new MutationObserver(muts => {
+    for (const m of muts) {
+      if (m.type === 'childList' && m.addedNodes && m.addedNodes.length) {
+        __jumpTo(themeContainer);
+        break;
+      }
+    }
+  });
+  obs.observe(themeContainer, { childList: true });
+})();
