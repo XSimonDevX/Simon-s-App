@@ -1555,3 +1555,36 @@ document.addEventListener('click', (e) => {
     obs.observe(themeContainer, { childList: true });
   }
 })();
+
+/* ===== Force-start CLOSED (runs after your own load handlers) ===== */
+(function () {
+  function forceCloseAll() {
+    try {
+      // Close any panels that were auto-opened
+      document.querySelectorAll('section.panel').forEach(p => p.classList.remove('active'));
+      // Deactivate tab buttons
+      document.querySelectorAll('#topBar .tabBtn').forEach(b => {
+        b.classList.remove('active');
+        b.setAttribute('aria-expanded', 'false');
+      });
+      // Don’t reopen last panel next time
+      try { localStorage.removeItem('lastPanel'); } catch {}
+      // If a theme grid auto-rendered, clear it
+      const tc = document.getElementById('themeContainer');
+      if (tc) tc.innerHTML = '';
+    } catch {}
+  }
+
+  // Run after your other window.onload handlers
+  if (document.readyState === 'complete') {
+    // page already loaded
+    setTimeout(forceCloseAll, 0);
+    setTimeout(forceCloseAll, 50);
+  } else {
+    // ensure we fire after other onload callbacks
+    window.addEventListener('load', () => {
+      setTimeout(forceCloseAll, 0);
+      setTimeout(forceCloseAll, 50);
+    });
+  }
+})();
