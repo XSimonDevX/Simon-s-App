@@ -1484,3 +1484,137 @@ window.addEventListener('resize', () => setTimeout(__setNavOffsetVar, 50));
   };
 })();
 
+/* =======================================================
+   START-CLOSED + ALWAYS-JUMP PATCH (drop-in, safe)
+   Paste this at the VERY END of your JS file.
+   ======================================================= */
+
+// --- helper: smooth, offset-aware jump (respects reduced motion)
+function __jumpTo(el, { smooth = true } = {}) {
+  if (!el) return;
+
+  const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const behavior = (smooth && !reduced) ? 'smooth' : 'auto';
+
+  // align with fixed top bar using a CSS var
+  const navOffset =
+    getComputedStyle(document.documentElement).getPropertyValue('--nav-offset') || '0px';
+  el.style.scrollMarginTop = (navOffset && navOffset.trim()) || '0px';
+
+  // jump after layout settles
+  requestAnimationFrame(() => {
+    try {
+      el.scrollIntoView({ block: 'start', behavior });
+      // A11y: move focus so SRs announce the new context
+      el.setAttribute('tabindex', '-1');
+      el.focus({ preventScroll: true });
+    } catch {}
+  });
+}
+
+// --- keep --nav-offset in sync with your fixed top bar
+function __setNavOffsetVar() {
+  const bar = document.getElementById('topBar');
+  const px = bar ? (bar.offsetHeight + 12) + 'px' : '0px';
+  document.documentElement.style.setProperty('--nav-offset', px);
+}
+window.addEventListener('load', __setNavOffsetVar);
+window.addEventListener('resize', () => setTimeout(__setNavOffsetVar, 50));
+
+/* --------------------------
+   1) START CLOSED ON LOAD
+   -------------------------- */
+window.addEventListener('load', () => {
+  try {
+    // Close all panels and buttons
+    if (typeof panels !== 'undefined' && Array.isArray(panels)) {
+      panels.forEach(p => p.classList.remove('active'));
+    }
+    if (typeof tabButtons !== 'undefined' && Array.isArray(tabButtons)) {
+      tabButtons.forEach(b => {
+        b.classList.remove('active');
+        b.setAttribute('aria-expanded', 'false');
+      });
+    }
+    // Prevent auto-reopen of last panel
+    localStorage.removeItem('lastPanel');
+  } catch {}
+});
+
+/* --------------------------------------------
+   2) ALWAYS JUMP WHEN A CONTAINER/CATEGORY OPENS
+   Works for:
+   - showPanel(id) (your top menu containers)
+   - showTheme(set) (your category grids)
+   - direct .themeBtn clicks (dynamic)
+   -------------------------------------------- */
+
+// Wrap showPanel to jump after it opens
+(function __patchShowPanel() {
+  if (typeof window.showPanel !== 'function') return;
+  const __orig = window.showPanel;
+  window.showPanel = function(id) {
+    const r = __orig.apply(this, arguments);
+    const panel = document.getElementById(id);
+    if (panel) __jumpTo(panel);
+    return r;
+  };
+})();
+
+// Wrap showTheme to jump after it renders the grid
+(function __patchShowTheme() {
+  if (typeof window.showTheme === 'function') {
+    const __orig = window.showTheme;
+    window.showTheme = function(set) {
+      const r = __orig.apply(this, arguments);
+      const container = document.getElementById('themeContainer');
+      if (container) __jumpTo(container);
+      return r;
+    };
+  }
+})();
+
+// If someone clicks a theme button, wait a tick for render then jump
+document.addEventListener('click', (e) => {
+  const btn = e.target.closest('.themeBtn');
+  if (!btn) return;
+  setTimeout(() => {
+    const container = document.getElementById('themeContainer');
+    if (container) __jumpTo(container);
+  }, 0);
+});
+
+/* ----------------------------------------------------------------
+   3) MAKE IT BULLETPROOF: OBSERVE CHANGES AND JUMP EVERY TIME
+   If some code path opens things without calling showPanel/showTheme,
+   this MutationObserver will still catch it and scroll.
+   ---------------------------------------------------------------- */
+(function __observeOpens() {
+  // Panels: jump when any section.panel gains 'active'
+  const allPanels = document.querySelectorAll('section.panel');
+  allPanels.forEach(panel => {
+    const obs = new MutationObserver(muts => {
+      muts.forEach(m => {
+        if (m.type === 'attributes' && m.attributeName === 'class') {
+          if (panel.classList.contains('active')) __jumpTo(panel);
+        }
+      });
+    });
+    obs.observe(panel, { attributes: true });
+  });
+
+  // Theme/category grid: jump when new items are rendered
+  const themeContainer = document.getElementById('themeContainer');
+  if (themeContainer) {
+    const obs2 = new MutationObserver(muts => {
+      for (const m of muts) {
+        if (m.type === 'childList' && (m.addedNodes && m.addedNodes.length)) {
+          __jumpTo(themeContainer);
+          break;
+        }
+      }
+    });
+    obs2.observe(themeContainer, { childList: true });
+  }
+})();
+
