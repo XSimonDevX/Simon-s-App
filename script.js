@@ -1407,11 +1407,33 @@ function say(text){ try{ const u=new SpeechSynthesisUtterance(text); u.rate=1; s
 })();
 
 /* =======================================================
-   CONSOLIDATED: START CLOSED + ALWAYS JUMP (safe drop-in)
+   ALWAYS JUMP PAST THE MENU + HIGHLIGHT TARGET (final)
    Paste at the VERY END of your JS file. Remove older patches first.
    ======================================================= */
 
-// --- figure out the top bar offset and expose it as a CSS var
+const JUMP_EXTRA = 24;         // extra px past the fixed menu (tune 16–40)
+const HIGHLIGHT_MS = 900;      // how long the outline pulse stays
+
+// Inject a subtle highlight style
+(function __injectJumpStyles(){
+  const css = `
+    .jump-highlight {
+      outline: 3px solid #4f9ef8;
+      outline-offset: 0;
+      border-radius: 12px;
+      animation: jumpPulse ${HIGHLIGHT_MS}ms ease-out 1;
+    }
+    @keyframes jumpPulse {
+      0% { outline-width: 6px; opacity: 0.95; }
+      100% { outline-width: 3px; opacity: 1; }
+    }
+  `;
+  const style = document.createElement('style');
+  style.textContent = css;
+  document.head.appendChild(style);
+})();
+
+/* --- compute and expose the top bar offset so JS/CSS can use it --- */
 function __setNavOffsetVar() {
   const bar = document.getElementById('topBar');
   const px = bar ? (bar.offsetHeight + 12) + 'px' : '0px';
@@ -1420,55 +1442,57 @@ function __setNavOffsetVar() {
 window.addEventListener('load', __setNavOffsetVar);
 window.addEventListener('resize', () => setTimeout(__setNavOffsetVar, 50));
 
-// --- find the nearest scrollable ancestor (or window)
+/* --- find the nearest scrollable ancestor (or window) --- */
 function __getScrollParent(node) {
   let p = node && node.parentElement;
   const rx = /(auto|scroll|overlay)/;
   while (p && p !== document.body) {
     const style = getComputedStyle(p);
-    const overflowY = style.overflowY;
-    if (rx.test(overflowY) && p.scrollHeight > p.clientHeight) return p;
+    if (rx.test(style.overflowY) && p.scrollHeight > p.clientHeight) return p;
     p = p.parentElement;
   }
-  return window; // fallback to the page
+  return window;
 }
 
-// --- scroll to an element with an offset for the fixed header
+/* --- core scroll with extra offset so the menu is out of view --- */
 function __scrollToWithOffset(target, { smooth = true } = {}) {
   if (!target) return;
 
-  const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const behavior = (smooth && !reduced) ? 'smooth' : 'auto';
+  const prefersReduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const behavior = (smooth && !prefersReduce) ? 'smooth' : 'auto';
 
-  const navOffsetStr =
-    getComputedStyle(document.documentElement).getPropertyValue('--nav-offset').trim() || '0px';
+  const navOffsetStr = getComputedStyle(document.documentElement)
+    .getPropertyValue('--nav-offset').trim() || '0px';
   const navOffset = parseFloat(navOffsetStr) || 0;
+
+  // ⬇️ subtract a bit more than the nav so the menu is completely gone
+  const totalOffset = navOffset + JUMP_EXTRA;
 
   const parent = __getScrollParent(target);
   const rect = target.getBoundingClientRect();
 
   if (parent === window) {
-    const y = rect.top + window.pageYOffset - navOffset;
+    const y = rect.top + window.pageYOffset - totalOffset;
     window.scrollTo({ top: y, behavior });
   } else {
     const parentRect = parent.getBoundingClientRect();
-    const y = (rect.top - parentRect.top) + parent.scrollTop - navOffset;
+    const y = (rect.top - parentRect.top) + parent.scrollTop - totalOffset;
     parent.scrollTo({ top: y, behavior });
   }
 
-  // A11y: focus so screen readers announce the new context
-  target.setAttribute('tabindex', '-1');
-  try { target.focus({ preventScroll: true }); } catch {}
+  // A11y + nice visual affordance
+  try { target.setAttribute('tabindex', '-1'); target.focus({ preventScroll: true }); } catch {}
+  target.classList.add('jump-highlight');
+  setTimeout(() => target.classList.remove('jump-highlight'), HIGHLIGHT_MS);
 }
 
-// --- convenience wrapper
+/* --- convenience wrapper: wait a frame for layout, then scroll --- */
 function __jumpTo(el) {
-  // wait a frame so layout after class changes/render is settled
   requestAnimationFrame(() => __scrollToWithOffset(el));
 }
 
 /* --------------------------
-   1) START CLOSED ON LOAD
+   keep app START-CLOSED
    -------------------------- */
 window.addEventListener('load', () => {
   try {
@@ -1486,74 +1510,78 @@ window.addEventListener('load', () => {
 });
 
 /* --------------------------------------------
-   2) ALWAYS JUMP WHEN A CONTAINER/CATEGORY OPENS
+   ALWAYS JUMP WHEN SOMETHING OPENS
    -------------------------------------------- */
 
-// Wrap showPanel to jump after open
+// When a panel (container) opens
 (function () {
   if (typeof window.showPanel !== 'function') return;
   const __orig = window.showPanel;
   window.showPanel = function(id) {
     const r = __orig.apply(this, arguments);
     const panel = document.getElementById(id);
-    if (panel) __jumpTo(panel);
+    // prefer a header/anchor inside the panel if present
+    const target = panel && (panel.querySelector('[data-jump-target], h1, h2, .section-title') || panel);
+    if (target) __jumpTo(target);
     return r;
   };
 })();
 
-// Wrap showTheme to jump after the grid renders
+// When a theme/category grid opens
 (function () {
   if (typeof window.showTheme !== 'function') return;
   const __orig = window.showTheme;
   window.showTheme = function(set) {
     const r = __orig.apply(this, arguments);
     const container = document.getElementById('themeContainer');
-    if (container) __jumpTo(container);
+    // prefer the first item in the grid so its top aligns with the screen top
+    const firstItem = container && (container.querySelector('.card, .picker-item') || container);
+    if (firstItem) __jumpTo(firstItem);
     return r;
   };
 })();
 
-// If theme buttons are clicked, jump after render (covers dynamic creation)
+// Also handle direct clicks on dynamically created theme buttons
 document.addEventListener('click', (e) => {
   const btn = e.target.closest('.themeBtn');
   if (!btn) return;
   setTimeout(() => {
     const container = document.getElementById('themeContainer');
-    if (container) __jumpTo(container);
+    const firstItem = container && (container.querySelector('.card, .picker-item') || container);
+    if (firstItem) __jumpTo(firstItem);
   }, 0);
 });
 
 /* ----------------------------------------------------------------
-   3) SAFETY NETS: observe changes and jump every time something opens
+   SAFETY NETS: observe changes (works even if open happens elsewhere)
    ---------------------------------------------------------------- */
-
-// Panels: when any section.panel gains 'active'
 (function () {
-  const allPanels = document.querySelectorAll('section.panel');
-  allPanels.forEach(panel => {
+  // Panels: jump when any section.panel gains 'active'
+  document.querySelectorAll('section.panel').forEach(panel => {
     const obs = new MutationObserver(muts => {
       for (const m of muts) {
         if (m.type === 'attributes' && m.attributeName === 'class' && panel.classList.contains('active')) {
-          __jumpTo(panel);
+          const target = panel.querySelector('[data-jump-target], h1, h2, .section-title') || panel;
+          __jumpTo(target);
           break;
         }
       }
     });
     obs.observe(panel, { attributes: true, attributeFilter: ['class'] });
   });
-})();
 
-// Theme/category grid: when new items are rendered
-(function () {
+  // Theme/category grid: when items render, jump to the first item
   const themeContainer = document.getElementById('themeContainer');
-  if (!themeContainer) return;
-  const obs = new MutationObserver(muts => {
-    for (const m of muts) {
-      if (m.type === 'childList' && m.addedNodes && m.addedNodes.length) {
-        __jumpTo(themeContainer);
-        break;
+  if (themeContainer) {
+    const obs = new MutationObserver(muts => {
+      for (const m of muts) {
+        if (m.type === 'childList' && m.addedNodes && m.addedNodes.length) {
+          const firstItem = themeContainer.querySelector('.card, .picker-item') || themeContainer;
+          __jumpTo(firstItem);
+          break;
+        }
       }
-    }
-  });
-  obs.observe(themeContainer, { childList: true });
+    });
+    obs.observe(themeContainer, { childList: true });
+  }
 })();
