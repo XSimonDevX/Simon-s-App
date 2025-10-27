@@ -1407,24 +1407,24 @@ function say(text){ try{ const u=new SpeechSynthesisUtterance(text); u.rate=1; s
 })();
 
 /* =======================================================
-   ALWAYS JUMP PAST THE MENU + HIGHLIGHT TARGET (final)
-   Paste at the VERY END of your JS file. Remove older patches first.
+   CONTAINER-AT-TOP + CONTAINER HIGHLIGHT (replace previous)
    ======================================================= */
 
-const JUMP_EXTRA = 24;         // extra px past the fixed menu (tune 16–40)
-const HIGHLIGHT_MS = 900;      // how long the outline pulse stays
+const FORCE_TOP = true;   // true = put container's top at the very top of the screen
+const JUMP_EXTRA = 24;    // extra px to push past the menu if FORCE_TOP is false
+const HIGHLIGHT_MS = 900; // highlight duration
 
-// Inject a subtle highlight style
+// highlight style for the WHOLE container
 (function __injectJumpStyles(){
   const css = `
     .jump-highlight {
       outline: 3px solid #4f9ef8;
       outline-offset: 0;
-      border-radius: 12px;
+      border-radius: 16px;
       animation: jumpPulse ${HIGHLIGHT_MS}ms ease-out 1;
     }
     @keyframes jumpPulse {
-      0% { outline-width: 6px; opacity: 0.95; }
+      0% { outline-width: 6px; opacity: 0.96; }
       100% { outline-width: 3px; opacity: 1; }
     }
   `;
@@ -1433,7 +1433,7 @@ const HIGHLIGHT_MS = 900;      // how long the outline pulse stays
   document.head.appendChild(style);
 })();
 
-/* --- compute and expose the top bar offset so JS/CSS can use it --- */
+// keep a CSS var for the top bar height in case you switch to "below header" mode
 function __setNavOffsetVar() {
   const bar = document.getElementById('topBar');
   const px = bar ? (bar.offsetHeight + 12) + 'px' : '0px';
@@ -1442,127 +1442,99 @@ function __setNavOffsetVar() {
 window.addEventListener('load', __setNavOffsetVar);
 window.addEventListener('resize', () => setTimeout(__setNavOffsetVar, 50));
 
-/* --- find the nearest scrollable ancestor (or window) --- */
+// find nearest scrollable parent
 function __getScrollParent(node) {
   let p = node && node.parentElement;
   const rx = /(auto|scroll|overlay)/;
   while (p && p !== document.body) {
-    const style = getComputedStyle(p);
-    if (rx.test(style.overflowY) && p.scrollHeight > p.clientHeight) return p;
+    const s = getComputedStyle(p);
+    if (rx.test(s.overflowY) && p.scrollHeight > p.clientHeight) return p;
     p = p.parentElement;
   }
   return window;
 }
 
-/* --- core scroll with extra offset so the menu is out of view --- */
-function __scrollToWithOffset(target, { smooth = true } = {}) {
-  if (!target) return;
+// scroll so the container is at the top; highlight the CONTAINER itself
+function __scrollContainerToTop(container) {
+  if (!container) return;
 
-  const prefersReduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const behavior = (smooth && !prefersReduce) ? 'smooth' : 'auto';
+  const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const behavior = reduce ? 'auto' : 'smooth';
 
-  const navOffsetStr = getComputedStyle(document.documentElement)
-    .getPropertyValue('--nav-offset').trim() || '0px';
+  const navOffsetStr = getComputedStyle(document.documentElement).getPropertyValue('--nav-offset').trim() || '0px';
   const navOffset = parseFloat(navOffsetStr) || 0;
 
-  // ⬇️ subtract a bit more than the nav so the menu is completely gone
-  const totalOffset = navOffset + JUMP_EXTRA;
+  // If FORCE_TOP=true: align container’s top to the top edge (0px) — menu fully gone.
+  // If false: align just below fixed header, plus a small extra push.
+  const offset = FORCE_TOP ? 0 : (navOffset + JUMP_EXTRA);
 
-  const parent = __getScrollParent(target);
-  const rect = target.getBoundingClientRect();
+  // include container's own margin-top so it truly touches the top
+  const mt = parseFloat(getComputedStyle(container).marginTop) || 0;
+
+  const parent = __getScrollParent(container);
+  const rect = container.getBoundingClientRect();
 
   if (parent === window) {
-    const y = rect.top + window.pageYOffset - totalOffset;
+    const y = rect.top + window.pageYOffset - offset - mt;
     window.scrollTo({ top: y, behavior });
   } else {
     const parentRect = parent.getBoundingClientRect();
-    const y = (rect.top - parentRect.top) + parent.scrollTop - totalOffset;
+    const y = (rect.top - parentRect.top) + parent.scrollTop - offset - mt;
     parent.scrollTo({ top: y, behavior });
   }
 
-  // A11y + nice visual affordance
-  try { target.setAttribute('tabindex', '-1'); target.focus({ preventScroll: true }); } catch {}
-  target.classList.add('jump-highlight');
-  setTimeout(() => target.classList.remove('jump-highlight'), HIGHLIGHT_MS);
+  // focus + highlight the container itself
+  try { container.setAttribute('tabindex', '-1'); container.focus({ preventScroll: true }); } catch {}
+  container.classList.add('jump-highlight');
+  setTimeout(() => container.classList.remove('jump-highlight'), HIGHLIGHT_MS);
 }
 
-/* --- convenience wrapper: wait a frame for layout, then scroll --- */
-function __jumpTo(el) {
-  requestAnimationFrame(() => __scrollToWithOffset(el));
+// small helper to run after layout settles
+function __jumpToContainer(el) {
+  requestAnimationFrame(() => __scrollContainerToTop(el));
 }
 
-/* --------------------------
-   keep app START-CLOSED
-   -------------------------- */
-window.addEventListener('load', () => {
-  try {
-    if (typeof panels !== 'undefined' && Array.isArray(panels)) {
-      panels.forEach(p => p.classList.remove('active'));
-    }
-    if (typeof tabButtons !== 'undefined' && Array.isArray(tabButtons)) {
-      tabButtons.forEach(b => {
-        b.classList.remove('active');
-        b.setAttribute('aria-expanded', 'false');
-      });
-    }
-    localStorage.removeItem('lastPanel');
-  } catch {}
-});
-
-/* --------------------------------------------
-   ALWAYS JUMP WHEN SOMETHING OPENS
-   -------------------------------------------- */
-
-// When a panel (container) opens
+/* ---- when a panel (container) opens via showPanel ---- */
 (function () {
   if (typeof window.showPanel !== 'function') return;
   const __orig = window.showPanel;
   window.showPanel = function(id) {
     const r = __orig.apply(this, arguments);
-    const panel = document.getElementById(id);
-    // prefer a header/anchor inside the panel if present
-    const target = panel && (panel.querySelector('[data-jump-target], h1, h2, .section-title') || panel);
-    if (target) __jumpTo(target);
+    const container = document.getElementById(id);
+    if (container) __jumpToContainer(container); // ⬅️ highlight + top-align the container
     return r;
   };
 })();
 
-// When a theme/category grid opens
+/* ---- when a theme/category grid renders via showTheme ---- */
 (function () {
   if (typeof window.showTheme !== 'function') return;
   const __orig = window.showTheme;
   window.showTheme = function(set) {
     const r = __orig.apply(this, arguments);
     const container = document.getElementById('themeContainer');
-    // prefer the first item in the grid so its top aligns with the screen top
-    const firstItem = container && (container.querySelector('.card, .picker-item') || container);
-    if (firstItem) __jumpTo(firstItem);
+    if (container) __jumpToContainer(container); // ⬅️ highlight + top-align the grid CONTAINER
     return r;
   };
 })();
 
-// Also handle direct clicks on dynamically created theme buttons
+/* ---- also catch clicks on dynamic theme buttons ---- */
 document.addEventListener('click', (e) => {
   const btn = e.target.closest('.themeBtn');
   if (!btn) return;
   setTimeout(() => {
     const container = document.getElementById('themeContainer');
-    const firstItem = container && (container.querySelector('.card, .picker-item') || container);
-    if (firstItem) __jumpTo(firstItem);
+    if (container) __jumpToContainer(container);
   }, 0);
 });
 
-/* ----------------------------------------------------------------
-   SAFETY NETS: observe changes (works even if open happens elsewhere)
-   ---------------------------------------------------------------- */
+/* ---- safety nets: any time a panel becomes active, or the theme grid changes ---- */
 (function () {
-  // Panels: jump when any section.panel gains 'active'
   document.querySelectorAll('section.panel').forEach(panel => {
     const obs = new MutationObserver(muts => {
       for (const m of muts) {
         if (m.type === 'attributes' && m.attributeName === 'class' && panel.classList.contains('active')) {
-          const target = panel.querySelector('[data-jump-target], h1, h2, .section-title') || panel;
-          __jumpTo(target);
+          __jumpToContainer(panel); // ⬅️ container itself
           break;
         }
       }
@@ -1570,14 +1542,12 @@ document.addEventListener('click', (e) => {
     obs.observe(panel, { attributes: true, attributeFilter: ['class'] });
   });
 
-  // Theme/category grid: when items render, jump to the first item
   const themeContainer = document.getElementById('themeContainer');
   if (themeContainer) {
     const obs = new MutationObserver(muts => {
       for (const m of muts) {
         if (m.type === 'childList' && m.addedNodes && m.addedNodes.length) {
-          const firstItem = themeContainer.querySelector('.card, .picker-item') || themeContainer;
-          __jumpTo(firstItem);
+          __jumpToContainer(themeContainer); // ⬅️ container itself
           break;
         }
       }
