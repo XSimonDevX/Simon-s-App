@@ -1405,3 +1405,82 @@ function say(text){ try{ const u=new SpeechSynthesisUtterance(text); u.rate=1; s
   await displayCards();
   displayCoreWords();
 })();
+
+/* ===============================
+   AUTO-JUMP PATCH (safe drop-in)
+   Paste this at the VERY END of your JS file.
+   =============================== */
+
+// 1) helper: smooth, offset-aware jump (respects reduced motion)
+function __jumpTo(el, { smooth = true } = {}) {
+  if (!el) return;
+
+  // respect reduced motion
+  const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const behavior = (smooth && !reduced) ? 'smooth' : 'auto';
+
+  // align with fixed top bar using a CSS var we keep updated
+  const navOffset =
+    getComputedStyle(document.documentElement).getPropertyValue('--nav-offset') || '0px';
+  el.style.scrollMarginTop = (navOffset && navOffset.trim()) || '0px';
+
+  requestAnimationFrame(() => {
+    try {
+      el.scrollIntoView({ block: 'start', behavior });
+      // accessibility: focus so SRs announce new context
+      el.setAttribute('tabindex', '-1');
+      el.focus({ preventScroll: true });
+    } catch {}
+  });
+}
+
+// 2) keep a --nav-offset CSS var updated alongside your fixed top bar
+function __setNavOffsetVar() {
+  const bar = document.getElementById('topBar');
+  const px = bar ? (bar.offsetHeight + 12) + 'px' : '0px';
+  document.documentElement.style.setProperty('--nav-offset', px);
+}
+// run now and on resize (in case your existing handlers don’t set the var)
+window.addEventListener('load', __setNavOffsetVar);
+window.addEventListener('resize', () => setTimeout(__setNavOffsetVar, 50));
+
+// 3) auto-jump whenever a theme is shown
+(function __patchShowTheme() {
+  // if showTheme exists, wrap it to jump after render
+  if (typeof window.showTheme === 'function') {
+    const __origShowTheme = window.showTheme;
+    window.showTheme = function(set) {
+      const result = __origShowTheme.apply(this, arguments);
+      // #themeContainer is where the category renders in your code
+      const container = document.getElementById('themeContainer');
+      if (container) __jumpTo(container);
+      return result;
+    };
+  }
+
+  // also catch clicks on the dynamically created theme buttons
+  // (works even if renderThemeButtons gets called later)
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('.themeBtn');
+    if (!btn) return;
+    // give your existing click handler a tick to render, then jump
+    setTimeout(() => {
+      const container = document.getElementById('themeContainer');
+      if (container) __jumpTo(container);
+    }, 0);
+  });
+})();
+
+// 4) optional: auto-jump to any panel you open via showPanel(..)
+// (safe wrapper; remove if you don’t want this)
+(function __patchShowPanel() {
+  if (typeof window.showPanel !== 'function') return;
+  const __origShowPanel = window.showPanel;
+  window.showPanel = function(id) {
+    const r = __origShowPanel.apply(this, arguments);
+    const panel = document.getElementById(id);
+    if (panel) __jumpTo(panel);
+    return r;
+  };
+})();
+
