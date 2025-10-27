@@ -1407,33 +1407,15 @@ function say(text){ try{ const u=new SpeechSynthesisUtterance(text); u.rate=1; s
 })();
 
 /* =======================================================
-   CONTAINER-AT-TOP + CONTAINER HIGHLIGHT (replace previous)
+   CONTAINER-AT-TOP + JS-ONLY HIGHLIGHT + SCROLL-TO-TOP-ON-CLOSE
+   (drop-in replacement)
    ======================================================= */
 
-const FORCE_TOP = true;   // true = put container's top at the very top of the screen
-const JUMP_EXTRA = 24;    // extra px to push past the menu if FORCE_TOP is false
-const HIGHLIGHT_MS = 900; // highlight duration
+const FORCE_TOP   = true;   // true = put opened container's top at the very top of the screen
+const JUMP_EXTRA  = 24;     // only used if FORCE_TOP = false
+const PULSE_MS    = 1000;   // exact highlight duration (1s)
 
-// highlight style for the WHOLE container
-(function __injectJumpStyles(){
-  const css = `
-    .jump-highlight {
-      outline: 3px solid #4f9ef8;
-      outline-offset: 0;
-      border-radius: 16px;
-      animation: jumpPulse ${HIGHLIGHT_MS}ms ease-out 1;
-    }
-    @keyframes jumpPulse {
-      0% { outline-width: 6px; opacity: 0.96; }
-      100% { outline-width: 3px; opacity: 1; }
-    }
-  `;
-  const style = document.createElement('style');
-  style.textContent = css;
-  document.head.appendChild(style);
-})();
-
-// keep a CSS var for the top bar height in case you switch to "below header" mode
+/* ---------- keep a CSS var for the top bar height ---------- */
 function __setNavOffsetVar() {
   const bar = document.getElementById('topBar');
   const px = bar ? (bar.offsetHeight + 12) + 'px' : '0px';
@@ -1442,7 +1424,7 @@ function __setNavOffsetVar() {
 window.addEventListener('load', __setNavOffsetVar);
 window.addEventListener('resize', () => setTimeout(__setNavOffsetVar, 50));
 
-// find nearest scrollable parent
+/* ---------- find nearest scrollable parent ---------- */
 function __getScrollParent(node) {
   let p = node && node.parentElement;
   const rx = /(auto|scroll|overlay)/;
@@ -1454,7 +1436,43 @@ function __getScrollParent(node) {
   return window;
 }
 
-// scroll so the container is at the top; highlight the CONTAINER itself
+/* ---------- JS-only highlight pulse on the CONTAINER ---------- */
+function __pulseContainer(container, duration = PULSE_MS) {
+  if (!container) return;
+
+  // focus for SRs (prevent native focus ring visually)
+  try { container.setAttribute('tabindex', '-1'); container.focus({ preventScroll: true }); } catch {}
+
+  // save inline styles to restore precisely
+  const prevBoxShadow  = container.style.boxShadow;
+  const prevOutline    = container.style.outline;
+  const prevTransition = container.style.transition;
+
+  // suppress native outline during pulse
+  container.style.outline = 'none';
+  container.style.transition = 'box-shadow ' + duration + 'ms ease-out';
+
+  // start strong…
+  container.style.boxShadow = '0 0 0 10px rgba(79,158,248,0.85)';
+
+  // …then fade to subtle on next frame
+  requestAnimationFrame(() => {
+    container.style.boxShadow = '0 0 0 3px rgba(79,158,248,0.35)';
+  });
+
+  // clean up after exactly duration
+  setTimeout(() => {
+    container.style.transition = prevTransition;
+    container.style.boxShadow  = prevBoxShadow;
+    container.style.outline    = prevOutline;
+
+    // blur + remove tabindex so no outline snaps back and no stray focus remains
+    try { container.blur(); } catch {}
+    container.removeAttribute('tabindex');
+  }, duration);
+}
+
+/* ---------- scroll so the CONTAINER is at the top ---------- */
 function __scrollContainerToTop(container) {
   if (!container) return;
 
@@ -1464,11 +1482,7 @@ function __scrollContainerToTop(container) {
   const navOffsetStr = getComputedStyle(document.documentElement).getPropertyValue('--nav-offset').trim() || '0px';
   const navOffset = parseFloat(navOffsetStr) || 0;
 
-  // If FORCE_TOP=true: align container’s top to the top edge (0px) — menu fully gone.
-  // If false: align just below fixed header, plus a small extra push.
   const offset = FORCE_TOP ? 0 : (navOffset + JUMP_EXTRA);
-
-  // include container's own margin-top so it truly touches the top
   const mt = parseFloat(getComputedStyle(container).marginTop) || 0;
 
   const parent = __getScrollParent(container);
@@ -1483,42 +1497,39 @@ function __scrollContainerToTop(container) {
     parent.scrollTo({ top: y, behavior });
   }
 
-  // focus + highlight the container itself
-  try { container.setAttribute('tabindex', '-1'); container.focus({ preventScroll: true }); } catch {}
-  container.classList.add('jump-highlight');
-  setTimeout(() => container.classList.remove('jump-highlight'), HIGHLIGHT_MS);
+  __pulseContainer(container, PULSE_MS);
 }
 
-// small helper to run after layout settles
+/* ---------- helper: run after layout settles ---------- */
 function __jumpToContainer(el) {
   requestAnimationFrame(() => __scrollContainerToTop(el));
 }
 
-/* ---- when a panel (container) opens via showPanel ---- */
+/* ---------- when a panel (container) OPENS via showPanel ---------- */
 (function () {
   if (typeof window.showPanel !== 'function') return;
   const __orig = window.showPanel;
   window.showPanel = function(id) {
     const r = __orig.apply(this, arguments);
     const container = document.getElementById(id);
-    if (container) __jumpToContainer(container); // ⬅️ highlight + top-align the container
+    if (container) __jumpToContainer(container);
     return r;
   };
 })();
 
-/* ---- when a theme/category grid renders via showTheme ---- */
+/* ---------- when a theme/category grid renders via showTheme ---------- */
 (function () {
   if (typeof window.showTheme !== 'function') return;
   const __orig = window.showTheme;
   window.showTheme = function(set) {
     const r = __orig.apply(this, arguments);
     const container = document.getElementById('themeContainer');
-    if (container) __jumpToContainer(container); // ⬅️ highlight + top-align the grid CONTAINER
+    if (container) __jumpToContainer(container);
     return r;
   };
 })();
 
-/* ---- also catch clicks on dynamic theme buttons ---- */
+/* ---------- also catch clicks on dynamic theme buttons ---------- */
 document.addEventListener('click', (e) => {
   const btn = e.target.closest('.themeBtn');
   if (!btn) return;
@@ -1528,13 +1539,14 @@ document.addEventListener('click', (e) => {
   }, 0);
 });
 
-/* ---- safety nets: any time a panel becomes active, or the theme grid changes ---- */
+/* ---------- SAFETY NETS: observe opens/renders ---------- */
 (function () {
+  // any panel gaining 'active'
   document.querySelectorAll('section.panel').forEach(panel => {
     const obs = new MutationObserver(muts => {
       for (const m of muts) {
         if (m.type === 'attributes' && m.attributeName === 'class' && panel.classList.contains('active')) {
-          __jumpToContainer(panel); // ⬅️ container itself
+          __jumpToContainer(panel);
           break;
         }
       }
@@ -1542,12 +1554,86 @@ document.addEventListener('click', (e) => {
     obs.observe(panel, { attributes: true, attributeFilter: ['class'] });
   });
 
+  // theme grid rendering
   const themeContainer = document.getElementById('themeContainer');
   if (themeContainer) {
     const obs = new MutationObserver(muts => {
       for (const m of muts) {
         if (m.type === 'childList' && m.addedNodes && m.addedNodes.length) {
-          __jumpToContainer(themeContainer); // ⬅️ container itself
+          __jumpToContainer(themeContainer);
+          break;
+        }
+      }
+    });
+    obs.observe(themeContainer, { childList: true });
+  }
+})();
+
+/* ---------- SCROLL TO TOP when a container is CLOSED ---------- */
+function __scrollRootToTop(fromEl) {
+  const parent = __getScrollParent(fromEl || document.body);
+  if (parent === window) {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } else {
+    parent.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+}
+
+// wrap closePanel so closing any container returns to the top/menu
+(function () {
+  if (typeof window.closePanel !== 'function') return;
+  const __orig = window.closePanel;
+  window.closePanel = function(id) {
+    const r = __orig.apply(this, arguments);
+    const panel = document.getElementById(id);
+    __scrollRootToTop(panel || document.body);
+    return r;
+  };
+})();
+
+// also intercept Escape-close and explicit .panelClose buttons already call closePanel,
+// but in case any code removes 'active' directly, observe and scroll up:
+(function () {
+  document.querySelectorAll('section.panel').forEach(panel => {
+    const obs = new MutationObserver(muts => {
+      for (const m of muts) {
+        if (m.type === 'attributes' && m.attributeName === 'class' && !panel.classList.contains('active')) {
+          __scrollRootToTop(panel);
+          break;
+        }
+      }
+    });
+    obs.observe(panel, { attributes: true, attributeFilter: ['class'] });
+  });
+})();
+
+/* ---------- Force-start CLOSED (after your own load handlers) ---------- */
+(function () {
+  function forceCloseAll() {
+    try {
+      document.querySelectorAll('section.panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('#topBar .tabBtn').forEach(b => {
+        b.classList.remove('active');
+        b.setAttribute('aria-expanded', 'false');
+      });
+      try { localStorage.removeItem('lastPanel'); } catch {}
+      const tc = document.getElementById('themeContainer');
+      if (tc) tc.innerHTML = '';
+      // also ensure we are at the very top at app start
+      __scrollRootToTop(document.body);
+    } catch {}
+  }
+  if (document.readyState === 'complete') {
+    setTimeout(forceCloseAll, 0);
+    setTimeout(forceCloseAll, 50);
+  } else {
+    window.addEventListener('load', () => {
+      setTimeout(forceCloseAll, 0);
+      setTimeout(forceCloseAll, 50);
+    });
+  }
+})();
+ __jumpToContainer(themeContainer); // ⬅️ container itself
           break;
         }
       }
